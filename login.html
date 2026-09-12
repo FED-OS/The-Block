@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sign in — The Block</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='56' height='56' rx='12' fill='%2355bd87' transform='rotate(-8 32 32)'/%3E%3Ctext x='32' y='44' font-family='Arial Black,Arial' font-size='34' font-weight='900' fill='%23fff' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E" />
+<style>
+  /* ================================================================
+     The Block — Supabase Login Embed
+     One file. No build. No npm. Pure HTML + CSS + JS (CDN client).
+     ================================================================ */
+  * { box-sizing: border-box; }
+  :root {
+    --paper: #111916;      /* page background */
+    --surface: #1a2420;    /* card */
+    --line: #2c3a34;       /* borders */
+    --ink: #eef6f0;        /* text */
+    --muted: #9ab3a6;      /* secondary text */
+    --green: #55bd87;      /* brand green */
+    --green-dark: #2f7d5a;
+    --acid: #c6ff3d;       /* action green */
+    --cyan: #4de8ff;
+    --pink: #ff4f9a;
+    --gold: #f8d477;
+    --err: #ff7d92;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --sans: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  body {
+    margin: 0; min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    background:
+      radial-gradient(1100px 500px at 85% -10%, rgba(85,189,135,.16), transparent 60%),
+      radial-gradient(900px 460px at -10% 110%, rgba(198,255,61,.07), transparent 55%),
+      var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    padding: 1.5rem;
+  }
+  .wrap { width: 100%; max-width: 420px; }
+
+  .brand-row { display: flex; align-items: center; gap: .6rem; justify-content: center; margin-bottom: 1.1rem; }
+  .brand-mark {
+    width: 40px; height: 40px; flex: none;
+    display: grid; place-items: center;
+    background: var(--green); color: #fff;
+    font-weight: 900; font-size: 1.35rem;
+    border-radius: 10px; transform: rotate(-8deg);
+    box-shadow: 0 0 22px rgba(85,189,135,.45);
+    font-family: var(--sans);
+  }
+  .brand-row span { font-weight: 700; letter-spacing: .02em; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 1.75rem;
+    box-shadow: 0 18px 50px rgba(0,0,0,.45);
+  }
+  h1 { margin: 0 0 .35rem; font-size: 1.45rem; letter-spacing: .01em; }
+  .sub { margin: 0 0 1.25rem; color: var(--muted); font-size: .9rem; line-height: 1.45; }
+
+  label { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; }
+  input {
+    width: 100%; padding: .7rem .85rem; margin-bottom: .95rem;
+    border: 1px solid var(--line); border-radius: 10px;
+    background: var(--paper); color: var(--ink);
+    font-family: var(--mono); font-size: .85rem;
+    outline: none; transition: border-color .15s, box-shadow .15s;
+  }
+  input::placeholder { color: #5c6f66; }
+  input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(85,189,135,.22); }
+
+  button {
+    width: 100%; padding: .78rem 1rem;
+    border: none; border-radius: 10px;
+    font-family: var(--sans); font-size: .95rem; font-weight: 700;
+    cursor: pointer; transition: filter .15s, background .15s, border-color .15s;
+  }
+  button:disabled { opacity: .55; cursor: not-allowed; }
+  .primary { background: var(--acid); color: #0c130f; }
+  .primary:hover:not(:disabled) { filter: brightness(1.08); }
+
+  .row { display: flex; flex-direction: column; gap: .15rem; margin-top: 1.1rem; }
+  .link {
+    background: none; border: none; width: auto; padding: .3rem 0; text-align: left;
+    color: var(--green); font-size: .8rem; font-weight: 600;
+  }
+  .link:hover { text-decoration: underline; }
+
+  .divider { display: flex; align-items: center; gap: .75rem; margin: 1.35rem 0 .9rem; color: var(--muted); font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; }
+  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+  .oauth { background: none; border: 1px solid var(--line); color: var(--ink); margin-top: .55rem; font-weight: 600; font-size: .88rem; }
+  .oauth:hover:not(:disabled) { border-color: var(--green); background: rgba(85,189,135,.08); }
+
+  .alert { padding: .65rem .8rem; border-radius: 10px; font-size: .8rem; margin-bottom: 1rem; display: none; line-height: 1.4; }
+  .alert.show { display: block; }
+  .alert.err { background: rgba(255,125,146,.1); color: var(--err); border: 1px solid rgba(255,125,146,.35); }
+  .alert.ok  { background: rgba(198,255,61,.08); color: var(--acid); border: 1px solid rgba(198,255,61,.3); }
+
+  .hidden { display: none !important; }
+  .signed-in { text-align: center; }
+  .avatar {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: var(--green); color: #fff;
+    font-size: 1.6rem; font-weight: 900;
+    display: grid; place-items: center; margin: .25rem auto 1rem;
+    box-shadow: 0 0 26px rgba(85,189,135,.5);
+  }
+  .meta { color: var(--muted); font-family: var(--mono); font-size: .68rem; margin-top: .9rem; text-align: center; }
+  .meta code { color: var(--muted); }
+
+  @media (max-width: 480px) {
+    .card { padding: 1.35rem; }
+    body { padding: 1rem; }
+  }
+</style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand-row">
+    <div class="brand-mark" aria-hidden="true">B</div>
+    <span>The Block</span>
+  </div>
+
+  <div class="card" id="card">
+    <div id="loading" style="text-align:center;color:var(--muted);font-size:.85rem;">Loading&hellip;</div>
+
+    <!-- SIGNED-IN VIEW -->
+    <div id="signedIn" class="hidden signed-in">
+      <div class="avatar" id="avatar">?</div>
+      <h1>You're in.</h1>
+      <p class="sub" id="userEmail"></p>
+      <button class="primary" id="signOutBtn">Sign out</button>
+      <p class="meta">Session kept in this browser &middot; <a href="./index.html" style="color:var(--green);font-weight:600;">Open the forum &rarr;</a></p>
+    </div>
+
+    <!-- LOGIN VIEW -->
+    <div id="loginView" class="hidden">
+      <h1 id="formTitle">Sign in</h1>
+      <p class="sub" id="formSub">Welcome back. Email + password, that's it.</p>
+
+      <div class="alert" id="alert"></div>
+
+      <form id="authForm" novalidate>
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="you@example.com" autocomplete="email" required />
+
+        <div id="passwordWrap">
+          <label for="password">Password</label>
+          <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" minlength="6" required />
+        </div>
+
+        <button type="submit" class="primary" id="submitBtn">Sign in</button>
+      </form>
+
+      <div class="row">
+        <button type="button" class="link" id="toggleSignup">Don't have an account? Make one</button>
+      </div>
+
+      <div class="divider">or continue with</div>
+      <button type="button" class="oauth" data-oauth="github">GitHub</button>
+      <button type="button" class="oauth" data-oauth="google">Google</button>
+
+      <p class="meta">Connected to Supabase project <code>oeantajwvhcuvygyjxmi</code></p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ==================================================================
+   CONFIG — your exact backend (from the Supabase dashboard)
+   Only the PUBLISHABLE key belongs in frontend code.
+   The sb_secret_... key never goes in HTML. Ever.
+   ================================================================== */
+const SUPABASE_URL = "https://oeantajwvhcuvygyjxmi.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_AInCq8jj9Kk3KPFNrXPDmQ_x3dMCkDx";
+
+/* ==================================================================
+   CLIENT — PKCE flow: the safest option for a static page.
+   ================================================================== */
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: {
+    flowType: "pkce",
+    detectSessionInUrl: true,
+    persistSession: true,
+    autoRefreshToken: true,
+  },
+});
+
+/* ================== DOM ================== */
+const $ = (id) => document.getElementById(id);
+const loadingEl = $("loading"), loginView = $("loginView"), signedInEl = $("signedIn");
+const alertEl = $("alert"), form = $("authForm");
+const emailEl = $("email"), passwordEl = $("password"), passwordWrap = $("passwordWrap");
+const submitBtn = $("submitBtn"), formTitle = $("formTitle"), formSub = $("formSub");
+const toggleSignup = $("toggleSignup"), userEmail = $("userEmail"), avatarEl = $("avatar");
+
+let mode = "signin"; /* "signin" | "signup" */
+
+/* ?next= — where to send the user after auth. The OAuth consent screen
+   uses this: it bounces signed-out users here, then we send them back.
+   Only same-origin paths are allowed (never //host or absolute URLs). */
+const nextParam = new URLSearchParams(location.search).get("next");
+const safeNext =
+  nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
+    ? nextParam
+    : null;
+function goNext() {
+  if (!safeNext) return;
+  loadingEl.textContent = "Signed in \u2014 heading back\u2026";
+  loadingEl.classList.remove("hidden");
+  loginView.classList.add("hidden");
+  signedInEl.classList.add("hidden");
+  location.replace(safeNext);
+}
+
+/* ================== UI ================== */
+function showAlert(text, type) {
+  alertEl.textContent = text;
+  alertEl.className = "alert show " + (type === "ok" ? "ok" : "err");
+}
+function clearAlert() { alertEl.textContent = ""; alertEl.className = "alert"; }
+function setMode(next) {
+  mode = next;
+  clearAlert();
+  if (mode === "signup") {
+    formTitle.textContent = "Make an account";
+    formSub.textContent = "Email + password. Six characters minimum.";
+    submitBtn.textContent = "Sign up";
+    passwordEl.setAttribute("autocomplete", "new-password");
+    toggleSignup.textContent = "Already have one? Sign in";
+  } else {
+    formTitle.textContent = "Sign in";
+    formSub.textContent = "Welcome back. Email + password, that's it.";
+    submitBtn.textContent = "Sign in";
+    passwordEl.setAttribute("autocomplete", "current-password");
+    toggleSignup.textContent = "Don't have an account? Make one";
+  }
+}
+function setBusy(b) {
+  submitBtn.disabled = b;
+  document.querySelectorAll("[data-oauth]").forEach((btn) => (btn.disabled = b));
+}
+function renderSession(session) {
+  loadingEl.classList.add("hidden");
+  if (session && session.user) {
+    loginView.classList.add("hidden");
+    signedInEl.classList.remove("hidden");
+    const email = session.user.email || "";
+    userEmail.textContent = email;
+    avatarEl.textContent = (email[0] || "?").toUpperCase();
+    if (safeNext) goNext(); /* came from the consent screen? head back */
+  } else {
+    signedInEl.classList.add("hidden");
+    loginView.classList.remove("hidden");
+  }
+}
+
+/* ================== AUTH ================== */
+async function handleSubmit(e) {
+  e.preventDefault();
+  clearAlert();
+  const email = emailEl.value.trim();
+  const password = passwordEl.value;
+  if (!email) return showAlert("Enter your email.");
+  if (!password || password.length < 6) return showAlert("Password needs 6+ characters.");
+
+  setBusy(true);
+  try {
+    if (mode === "signup") {
+      const { data, error } = await db.auth.signUp({ email, password });
+      if (error) throw error;
+      if (data.session) {
+        showAlert("Account made — you're in.", "ok");
+      } else {
+        showAlert("Account made. Check your email to confirm, then sign in.", "ok");
+      }
+    } else {
+      const { error } = await db.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      showAlert("Signed in.", "ok");
+    }
+  } catch (err) {
+    showAlert(err.message || "Something went wrong. Try again.");
+  } finally {
+    setBusy(false);
+  }
+}
+async function handleOAuth(provider) {
+  clearAlert();
+  setBusy(true);
+  const { error } = await db.auth.signInWithOAuth({
+    provider,
+    options: { redirectTo: window.location.origin },
+  });
+  if (error) { showAlert(error.message); setBusy(false); }
+  /* success = browser navigates away */
+}
+async function handleSignOut() {
+  await db.auth.signOut();
+  clearAlert();
+  setMode("signin");
+  renderSession(null);
+}
+
+/* ================== EVENTS ================== */
+form.addEventListener("submit", handleSubmit);
+toggleSignup.addEventListener("click", () => setMode(mode === "signup" ? "signin" : "signup"));
+$("signOutBtn").addEventListener("click", handleSignOut);
+document.querySelectorAll("[data-oauth]").forEach((btn) => {
+  btn.addEventListener("click", () => handleOAuth(btn.dataset.oauth));
+});
+
+/* ================== BOOT ================== */
+db.auth.onAuthStateChange((event, session) => {
+  /* ignore the INITIAL_SESSION echo; renderSession is idempotent */
+  renderSession(session);
+});
+
+db.auth.getSession()
+  .then(({ data, error }) => {
+    if (error) {
+      loadingEl.textContent = "Auth error: " + error.message;
+      return;
+    }
+    setMode("signin");
+    renderSession(data.session);
+  })
+  .catch((err) => {
+    loadingEl.textContent = "Failed to reach Supabase: " + err.message;
+  });
+</script>
+</body>
+</html>

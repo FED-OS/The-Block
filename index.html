@@ -5,14 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="The Block is a simple, free place for practical ideas, clear guides, and helpful templates.">
   <title>The Block | Simple ideas. Clear next steps.</title>
+  <!-- Favicon: inline SVG (works even if icon files are missing) + file fallbacks for Safari/iOS. -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22 role=%22img%22 aria-label=%22The Block%22%3E %3Cdefs%3E %3ClinearGradient id=%22tile%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22%3E %3Cstop offset=%220%22 stop-color=%22%238be0ae%22/%3E %3Cstop offset=%221%22 stop-color=%22%2355bd87%22/%3E %3C/linearGradient%3E %3CradialGradient id=%22halo%22 cx=%220.5%22 cy=%220.5%22 r=%220.5%22%3E %3Cstop offset=%220.62%22 stop-color=%22%23c6ff3d%22 stop-opacity=%220.55%22/%3E %3Cstop offset=%221%22 stop-color=%22%23c6ff3d%22 stop-opacity=%220%22/%3E %3C/radialGradient%3E %3Cfilter id=%22soft%22 x=%22-40%25%22 y=%22-40%25%22 width=%22180%25%22 height=%22180%25%22%3E %3CfeGaussianBlur stdDeviation=%224%22/%3E %3C/filter%3E %3C/defs%3E %3Crect width=%22128%22 height=%22128%22 rx=%2224%22 fill=%22%23111916%22/%3E %3Cellipse cx=%2264%22 cy=%2264%22 rx=%2266%22 ry=%2266%22 fill=%22url(%23halo)%22 filter=%22url(%23soft)%22/%3E %3Cg transform=%22rotate(-6 64 64)%22%3E %3Crect x=%2218.0%22 y=%2218.0%22 width=%2292%22 height=%2292%22 rx=%2223%22 fill=%22url(%23tile)%22/%3E %3Cpath d=%22M722 519Q722 392 607 359V355Q738 325 738 183Q738 129 711.5 87.5Q685 46 639.0 23.0Q593 0 538 0H74V688H532Q584 688 627.5 666.5Q671 645 696.5 606.0Q722 567 722 519ZM295 420H447Q469 420 483.5 435.5Q498 451 498 474V484Q498 506 483.0 521.5Q468 537 447 537H295ZM295 160H463Q485 160 499.5 175.5Q514 191 514 214V224Q514 247 499.5 262.5Q485 278 463 278H295Z%22 fill=%22%23ffffff%22 transform=%22translate(28.593 94.000) scale(0.087209 -0.087209)%22/%3E %3C/g%3E %3C/svg%3E">
+  <link rel="icon" href="favicon.ico" sizes="48x48">
+  <link rel="icon" href="favicon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- To go LIVE (shared forum for everybody): uncomment the line below,
-       run supabase-setup.sql in your Supabase SQL editor,
-       then set FORUM_CONFIG.mode = 'supabase' and fill in your keys
-       in the FORUM ENGINE script near the bottom of this file. -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> -->
+  <!-- Supabase (live mode) — loads the client library from the CDN. -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     (() => {
       const savedTheme = localStorage.getItem('the-block-theme');
@@ -1024,6 +1026,122 @@
     }
     .blm-cta .blm-email:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 rgba(248, 212, 119, .5); }
 
+    /* ============ SITE + THREAD VIEW COUNTERS ============ */
+    .signal-strip .views-pill {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-weight: 800;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+    .views-pill b { color: var(--gold); }
+    .delete-btn {
+      font-family: var(--mono);
+      font-size: .72rem;
+      font-weight: 700;
+      padding: .3rem .6rem;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color .15s, border-color .15s, background .15s;
+    }
+    .delete-btn:hover { color: #ff7d92; border-color: #ff7d92; background: rgba(255, 127, 146, .08); }
+    .delete-btn:disabled { opacity: .5; cursor: wait; }
+    .thread-side { display: flex; flex-direction: column; align-items: flex-end; gap: .35rem; }
+    .thread-side .delete-btn { margin-top: .15rem; }
+    .thread-meta .delete-btn { margin-left: .5rem; }
+    .reply-meta .delete-btn { margin-left: auto; }
+    .nocap-post-actions .delete-btn { margin-left: auto; }
+    .views-chip {
+      font-family: var(--mono);
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .views-chip b { color: var(--ink); }
+
+    /* ============ NO CAP SOCIAL FEED ============ */
+    .nocap-shell {
+      background: var(--card, #10131a);
+      border: 2px solid var(--line, #2a2f3d);
+      border-radius: 14px;
+      padding: 1rem;
+    }
+    .nocap-topbar {
+      display: flex;
+      gap: .6rem;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-bottom: .9rem;
+    }
+    .nocap-count { font-family: var(--mono); font-size: .78rem; color: var(--muted); }
+    .nocap-count b { color: var(--ink); }
+    .nocap-composer {
+      display: flex;
+      gap: .7rem;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    .nocap-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: var(--panel, #0b0e13);
+      border: 2px solid var(--acid);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-weight: 800;
+      font-size: .85rem; color: var(--acid);
+      flex-shrink: 0;
+    }
+    .nocap-main { flex: 1; min-width: 0; }
+    .nocap-textarea {
+      width: 100%;
+      min-height: 64px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--ink);
+      font-family: var(--body, inherit);
+      font-size: .95rem;
+      padding: .6rem .7rem;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+    .nocap-textarea:focus { outline: 2px solid var(--acid); outline-offset: 1px; }
+    .nocap-tools { display: flex; gap: .6rem; align-items: center; margin-top: .45rem; flex-wrap: wrap; }
+    .nocap-chars { font-family: var(--mono); font-size: .72rem; color: var(--muted); }
+    .nocap-chars.low { color: #ff4f9a; }
+    .nocap-feed { display: flex; flex-direction: column; gap: .8rem; }
+    .nocap-post {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: .7rem .8rem;
+      background: var(--panel, transparent);
+    }
+    .nocap-post-head { display: flex; gap: .55rem; align-items: center; flex-wrap: wrap; margin-bottom: .3rem; }
+    .nocap-post-author { font-weight: 700; font-size: .9rem; }
+    .nocap-post-time { font-family: var(--mono); font-size: .72rem; color: var(--muted); }
+    .nocap-post-body { white-space: pre-wrap; word-break: break-word; font-size: .95rem; line-height: 1.45; }
+    .nocap-post-actions { display: flex; gap: .8rem; align-items: center; margin-top: .5rem; }
+    .nocap-like {
+      border: 1px solid transparent;
+      background: none;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: .78rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: .15rem .45rem;
+      border-radius: 999px;
+      display: inline-flex; align-items: center; gap: .3rem;
+    }
+    .nocap-like:hover { color: var(--ink); }
+    .nocap-like.liked { color: #ff4f9a; border-color: rgba(255, 79, 154, .5); background: rgba(255, 79, 154, .12); }
+    .nocap-empty { color: var(--muted); text-align: center; padding: 1.2rem; font-size: .92rem; }
+
     @media (max-width: 760px) {
       .header-inner { min-height: 64px; }
       .nav-toggle { display: inline-flex; }
@@ -1063,6 +1181,8 @@
       .blm-process { grid-template-columns: repeat(2, 1fr); }
       .blm-banner .blm-motto { margin-left: 0; }
       .post-images img { max-width: 150px; max-height: 120px; }
+      .nocap-composer { flex-direction: column; }
+      .nocap-post .post-images img { max-width: 150px; max-height: 120px; }
     }
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
@@ -1090,6 +1210,7 @@
         <a href="#how-it-works">How to get moving</a>
         <a href="#community">The crew</a>
         <a href="#forum">The Forum</a>
+        <a href="#nocap">No Cap</a>
         <a href="#blm">Black Leaders Mgmt</a>
         <a href="#support">FAQ</a>
       </nav>
@@ -1190,6 +1311,7 @@
           <span>Ideas loading</span>
           <span>Good energy detected</span>
           <span>Next move: yours</span>
+          <span class="views-pill" id="site-views-pill" title="Every visit to this page, ever" hidden>&#128065; <b id="site-views-count">…</b> pull-ups</span>
         </div>
       </div>
     </section>
@@ -1287,7 +1409,7 @@ Please help me choose:
 
         <div class="forum-shell" id="forum-shell">
           <p class="forum-demo-note" id="forum-demo-note" hidden>
-            Demo mode — threads + images live in your browser only. To make it live for everybody (with email sign-in), set <code>FORUM_CONFIG.mode = 'supabase'</code> and drop in your URL + key. Setup SQL is in <code>supabase-setup.sql</code>.
+            Demo mode — threads + images live in your browser only. To make it live for everybody, set <code>FORUM_CONFIG.mode = 'supabase'</code> with your project URL + publishable key, and run <code>supabase-setup.sql</code>.
           </p>
 
           <div class="forum-topbar">
@@ -1315,6 +1437,35 @@ Please help me choose:
               </div>
             </form>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== NO CAP — SOCIAL FEED ===================== -->
+    <section class="section section--soft" id="nocap">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="section-label">🎉 THE SOCIAL FEED · REAL TALK ONLY</p>
+          <h2>No Cap.</h2>
+          <p class="intro">Quick thoughts, wins, memes, heat. No cap, all real. What's on your mind right now?</p>
+        </div>
+
+        <div class="nocap-shell">
+          <div class="nocap-topbar">
+            <span class="nocap-count" id="nocap-count">0 posts</span>
+          </div>
+          <div class="nocap-composer">
+            <div class="nocap-avatar" id="nocap-avatar" title="You">?</div>
+            <div class="nocap-main">
+              <textarea class="nocap-textarea" id="nocap-text" placeholder="Drop the real. No cap. What's happening?" maxlength="280" rows="2"></textarea>
+              <div class="nocap-tools">
+                <div class="attach-box" id="nocap-attach"></div>
+                <span class="nocap-chars" id="nocap-chars">280</span>
+                <button class="button button--primary" id="nocap-post-btn" type="button">Post it →</button>
+              </div>
+            </div>
+          </div>
+          <div class="nocap-feed" id="nocap-feed"></div>
         </div>
       </div>
     </section>
@@ -1414,7 +1565,7 @@ Please help me choose:
         </details>
         <details>
           <summary>How does the forum work?</summary>
-          <p>Pick a room that fits your topic, start a thread or reply to one, and keep the energy useful. You can attach images to threads and replies. The forum runs in demo mode from your browser — flip it to Supabase mode with the setup SQL (plus email sign-in) to make it live for everybody.</p>
+          <p>Pick a room that fits your topic, start a thread or reply to one, and keep the energy useful. You can attach images to threads and replies. The forum is live on Supabase — sign in with your email (magic link) to post, and your threads, replies, and pics are shared with the whole crew. Need a local-only version? Ask about demo mode.</p>
         </details>
         <details>
           <summary>What is Black Leaders Management?</summary>
@@ -1445,6 +1596,7 @@ Please help me choose:
         <a href="#start">Start here</a>
         <a href="#resources">Resources</a>
         <a href="#forum">Forum</a>
+        <a href="#nocap">No Cap</a>
         <a href="#blm">Black Leaders Mgmt</a>
         <a href="https://ko-fi.com/fedpromptly" target="_blank" rel="noopener noreferrer">Ko-fi ↗</a>
       </div>
@@ -1545,14 +1697,17 @@ Please help me choose:
     'use strict';
 
     /* ============ CONFIG ============
-       mode: 'demo'    -> runs on localStorage, works anywhere (GitHub Pages, file://)
-       mode: 'supabase' -> real shared forum. Fill in your URL + anon key,
-                           run supabase-setup.sql in your project's SQL editor,
-                           and load the supabase-js CDN script below.            */
+       mode: 'demo'     -> runs on localStorage, works anywhere (GitHub Pages, file://)
+       mode: 'supabase' -> live shared forum (what's set below).
+
+       This project is wired for real now. supabaseUrl + publishable key are
+       safe to expose in frontend code (same privileges as the old anon key).
+       NEVER put the sb_secret_ key in this file — that one is server-side only.
+       If you rotate the key in the dashboard, update it here too.            */
     const FORUM_CONFIG = {
-      mode: 'demo',
-      supabaseUrl: '',      // e.g. 'https://abcd1234.supabase.co'
-      supabaseAnonKey: ''   // your anon public key (safe for the frontend)
+      mode: 'supabase',
+      supabaseUrl: 'https://oeantajwvhcuvygyjxmi.supabase.co',
+      supabaseAnonKey: 'sb_publishable_AInCq8jj9Kk3KPFNrXPDmQ_x3dMCkDx'  // publishable key — safe for the frontend
     };
 
     /* ============ CATEGORIES (the rooms) ============ */
@@ -1574,7 +1729,7 @@ Please help me choose:
     const DAY = 86400000;
     const SEED_THREADS = [
       {
-        id: 'seed-rules', categoryId: 'front-door', author: 'Big Plug', pinned: true, votes: 14,
+        id: 'seed-rules', categoryId: 'front-door', author: 'Big Plug', pinned: true, votes: 14, views: 312,
         title: 'Read this before you post — the house rules',
         body: 'Real quick:\n\n1. Ask clear. Say what you are trying to do, what you tried, and what you need.\n2. Keep it kind. No gatekeeping, no flexing on beginners.\n3. Share the win, however small. Momentum is contagious.\n4. Be the plug. If you know a shortcut, drop it without the lecture.\n\nThat\'s it. Pull up.',
         createdAt: Date.now() - 3 * DAY,
@@ -1584,7 +1739,7 @@ Please help me choose:
         ]
       },
       {
-        id: 'seed-intro', categoryId: 'cookout', author: 'Big Plug', pinned: false, votes: 9,
+        id: 'seed-intro', categoryId: 'cookout', author: 'Big Plug', pinned: false, votes: 9, views: 187,
         title: 'Who you be? Drop your intro.',
         body: 'Pull up and introduce yourself. Where you from, what you building, what you trying to learn.\n\nExample: I\'m Big Plug, East Side. Building AI tools for the community. Currently learning agent frameworks.\n\nDon\'t be shy. Everybody started at zero.',
         createdAt: Date.now() - 2 * DAY,
@@ -1594,7 +1749,7 @@ Please help me choose:
         ]
       },
       {
-        id: 'seed-rag', categoryId: 'wave', author: 'CodeWave', pinned: false, votes: 7,
+        id: 'seed-rag', categoryId: 'wave', author: 'CodeWave', pinned: false, votes: 7, views: 143,
         title: 'Agents vs RAG — which one you running in 2026?',
         body: 'Everybody building agents right now but honestly for a lot of use cases plain RAG with good chunking still hits harder and costs less.\n\nWhat\'s the move? Full agent loop or RAG pipeline with a feedback step? What y\'all running in production?',
         createdAt: Date.now() - 1.2 * DAY,
@@ -1603,7 +1758,7 @@ Please help me choose:
         ]
       },
       {
-        id: 'seed-401', categoryId: 'cypher', author: 'MarcusJ', pinned: false, votes: 4,
+        id: 'seed-401', categoryId: 'cypher', author: 'MarcusJ', pinned: false, votes: 4, views: 96,
         title: 'Python API returning 401 — what am I missing?',
         body: 'Trying to hit an API with requests. Getting 401 Unauthorized.\n\nWhat I tried:\n- API key in headers\n- Double checked the key works in Postman (it does)\n- Checked for typos like 3 times\n\nCode:\n\nheaders = {"Authorization": f"Bearer {API_KEY}"}\nresponse = requests.get(url, headers=headers)\n\nPostman works, my script doesn\'t. What am I missing?',
         createdAt: Date.now() - 0.8 * DAY,
@@ -1612,7 +1767,7 @@ Please help me choose:
         ]
       },
       {
-        id: 'seed-demo', categoryId: 'kitchen', author: 'DeeCodes', pinned: false, votes: 8,
+        id: 'seed-demo', categoryId: 'kitchen', author: 'DeeCodes', pinned: false, votes: 8, views: 205,
         title: 'Friday Demo Day — show what you cooked this week',
         body: 'Every Friday. Drop what you built this week. Finished or not, ugly or clean. We celebrate the cook, not just the dish.\n\nI\'ll start: automated my job applications with Python + a spreadsheet. Ugly but it saved me 6 hours.',
         createdAt: Date.now() - 0.6 * DAY,
@@ -1622,7 +1777,7 @@ Please help me choose:
         ]
       },
       {
-        id: 'seed-jobs', categoryId: 'bag', author: 'Stacks', pinned: false, votes: 11,
+        id: 'seed-jobs', categoryId: 'bag', author: 'Stacks', pinned: false, votes: 11, views: 264,
         title: 'Who\'s hiring Black engineers right now?',
         body: 'Drop the company, role, and location/remote status. Referrals welcome.\n\nKeep it real: if the company\'s culture is mid, say that too. We protect each other\'s time.',
         createdAt: Date.now() - 0.4 * DAY,
@@ -1631,7 +1786,7 @@ Please help me choose:
         ]
       },
       {
-        id: 'seed-music', categoryId: 'barbershop', author: 'DeeCodes', pinned: false, votes: 5,
+        id: 'seed-music', categoryId: 'barbershop', author: 'DeeCodes', pinned: false, votes: 5, views: 71,
         title: 'What you listening to while you code?',
         body: 'Current rotation: lo-fi, Kendrick, and for debug sessions — silence lol.\n\nWhat\'s on your coding playlist? Drop it.',
         createdAt: Date.now() - 0.2 * DAY,
@@ -1643,6 +1798,10 @@ Please help me choose:
     const LS_THREADS = 'the-block-forum-threads';
     const LS_VOTES = 'the-block-forum-votes';
     const LS_HANDLE = 'the-block-forum-handle';
+    const LS_NOCAP = 'the-block-nocap-posts';
+    const LS_NOCAP_LIKES = 'the-block-nocap-likes';
+    const LS_SESSION_COUNTED = 'the-block-visit-counted';
+    const LS_SESSION_THREADS = 'the-block-threads-seen';
 
     const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -1676,6 +1835,81 @@ Please help me choose:
       document.body.appendChild(el);
       setTimeout(() => el.remove(), 2400);
     };
+
+    /* ============ VIEW COUNTERS (site total + per thread) ============
+       demo mode: localStorage counter (first visit per browser session counts).
+       supabase mode: site_stats counter via RPC + per-thread views column,
+                      bumped through RPCs so anonymous reads can't inflate.
+       Both modes: count a browser session once (sessionStorage guard).     */
+    const fmtViews = (n) => {
+      if (n == null) return '0';
+      if (n >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+      if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+      return String(n);
+    };
+
+    async function bumpSiteViews() {
+      const pill = document.getElementById('site-views-pill');
+      const num = document.getElementById('site-views-count');
+      if (!pill || !num) return;
+      const already = sessionStorage.getItem(LS_SESSION_COUNTED);
+      let total = null;
+      if (supa) {
+        try {
+          if (already) {
+            const { data } = await supa.rpc('get_site_views');
+            total = data;
+          } else {
+            const { data } = await supa.rpc('bump_site_views');
+            total = data;
+            sessionStorage.setItem(LS_SESSION_COUNTED, '1');
+          }
+        } catch (e) { total = null; }
+      }
+      if (total == null) {
+        /* demo fallback: local browser counter */
+        let n = parseInt(readLS('the-block-site-views', '0'), 10) || 0;
+        if (!already) { n += 1; writeLS('the-block-site-views', String(n)); sessionStorage.setItem(LS_SESSION_COUNTED, '1'); }
+        total = n;
+      }
+      num.textContent = fmtViews(total);
+      pill.removeAttribute('hidden');
+    }
+
+    async function bumpThreadViews(threadId) {
+      if (!threadId) return;
+      /* once per thread per browser session (re-renders don't inflate the count) */
+      try {
+        const seen = JSON.parse(sessionStorage.getItem(LS_SESSION_THREADS) || '[]');
+        if (seen.indexOf(threadId) !== -1) return;
+        seen.push(threadId);
+        sessionStorage.setItem(LS_SESSION_THREADS, JSON.stringify(seen));
+      } catch (e) { /* storage blocked - just count it */ }
+      let bumped = false;
+      if (supa) {
+        try { await supa.rpc('bump_thread_views', { tid: threadId }); bumped = true; } catch (e) { /* silent */ }
+      } else {
+        const threads = readLS(LS_THREADS, null) || [];
+        const t = threads.find((x) => x.id === threadId);
+        if (t) { t.views = (t.views || 0) + 1; writeLS(LS_THREADS, threads); bumped = true; }
+      }
+      if (!bumped) return;
+      /* keep the in-memory list accurate so the chip is right even before the background reload lands */
+      const inList = state.threads.find((x) => x.id === threadId);
+      if (inList) inList.views = (inList.views || 0) + 1;
+      /* update the chip in the open detail view immediately (raw count lives in data-v) */
+      if (state.threadId === threadId) {
+        const chip = document.getElementById('thread-views-count');
+        if (chip) {
+          const cur = parseInt(chip.dataset.v || '', 10);
+          const next = Number.isFinite(cur) ? cur + 1 : (inList ? (inList.views || 1) : 1);
+          chip.dataset.v = String(next);
+          chip.textContent = fmtViews(next);
+        }
+      }
+      /* refresh the local copy so list chips update on next render (don't clobber an open thread) */
+      loadThreads().then(() => { if (!state.threadId) renderThreadList(); }).catch(() => {});
+    }
 
     /* ============ IMAGE ENGINE ============ */
     const MAX_IMAGES = 3;
@@ -1798,6 +2032,25 @@ Please help me choose:
       return readLS(LS_HANDLE, null) || 'NewComer';
     };
 
+    /* who is looking at the page right now (refreshed at boot + on auth events) */
+    let me = null;
+    async function refreshMe() {
+      if (supa) {
+        const { data: { user } } = await supa.auth.getUser();
+        me = user ? { id: user.id } : null;
+      } else {
+        me = { id: null };   /* demo mode: it's all one browser, all yours */
+      }
+      return me;
+    }
+
+    /* can the current viewer delete this thing?
+       supabase: only your own rows (server double-checks via RLS anyway).
+       demo: everything lives in this browser, so it's all yours. */
+    const threadMine = (t) => supa ? !!(me && t.authorId && t.authorId === me.id) : true;
+    const replyMine  = (r) => supa ? !!(me && r.authorId && r.authorId === me.id) : true;
+    const nocapMine  = (p) => supa ? !!(me && p.authorId && p.authorId === me.id) : true;
+
     /* Upload images for the current post.
        demo mode: dataUrls already live in localStorage with the thread.
        supabase mode: push to the 'forum-images' storage bucket, return public URLs. */
@@ -1831,8 +2084,10 @@ Please help me choose:
             id: t.id,
             categoryId: t.category ? t.category.slug : 'front-door',
             author: (t.author && (t.author.display_name || t.author.username)) || 'member',
+            authorId: t.author_id || null,
             pinned: !!t.pinned,
             votes: 0,
+            views: t.views || 0,
             title: t.title,
             body: t.body,
             createdAt: t.created_at,
@@ -1841,7 +2096,7 @@ Please help me choose:
             replies: null
           }));
         }
-        return readLS(LS_THREADS, null) || seedIfEmpty();
+        return migrateReplyIds(readLS(LS_THREADS, null) || seedIfEmpty());
       },
 
       async getThread(id) {
@@ -1855,22 +2110,26 @@ Please help me choose:
             id: thread.id,
             categoryId: thread.category ? thread.category.slug : 'front-door',
             author: (thread.author && (thread.author.display_name || thread.author.username)) || 'member',
+            authorId: thread.author_id || null,
             pinned: !!thread.pinned,
             votes: 0,
+            views: thread.views || 0,
             title: thread.title,
             body: thread.body,
             createdAt: thread.created_at,
             images: thread.images || [],
             replyCount: (replies || []).length,
             replies: (replies || []).map((r) => ({
+              id: r.id,
               author: (r.author && (r.author.display_name || r.author.username)) || 'member',
+              authorId: r.author_id || null,
               body: r.body,
               images: r.images || [],
               createdAt: r.created_at
             }))
           };
         }
-        const threads = readLS(LS_THREADS, null) || seedIfEmpty();
+        const threads = migrateReplyIds(readLS(LS_THREADS, null) || seedIfEmpty());
         const t = threads.find((x) => x.id === id);
         return t ? { ...t, replyCount: (t.replies || []).length } : null;
       },
@@ -1892,7 +2151,7 @@ Please help me choose:
         const threads = readLS(LS_THREADS, null) || seedIfEmpty();
         threads.unshift({
           id: 't-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
-          categoryId, author, pinned: false, votes: 0,
+          categoryId, author, pinned: false, votes: 0, views: 0,
           title, body, images: pics, createdAt: Date.now(), replies: []
         });
         const saved = writeLS(LS_THREADS, threads);
@@ -1913,9 +2172,54 @@ Please help me choose:
         const t = threads.find((x) => x.id === threadId);
         if (!t) throw new Error('Thread not found');
         t.replies = t.replies || [];
-        t.replies.push({ author, body, images: pics, createdAt: Date.now() });
+        t.replies.push({ id: 'r-' + Date.now() + '-' + Math.floor(Math.random() * 1000), author, body, images: pics, createdAt: Date.now() });
         const saved = writeLS(LS_THREADS, threads);
         if (!saved) toast('Heads up: browser storage is full — image(s) kept for this session only.');
+      },
+
+      async deleteThread(threadId) {
+        if (supa) {
+          const { data: { user } } = await supa.auth.getUser();
+          if (!user) throw new Error('Sign in first (magic link email).');
+          const { error } = await supa.from('threads').delete().eq('id', threadId);
+          if (error) throw error;
+          return;
+        }
+        const threads = readLS(LS_THREADS, null) || [];
+        const next = threads.filter((t) => t.id !== threadId);
+        if (next.length === threads.length) throw new Error('Thread not found');
+        writeLS(LS_THREADS, next);
+      },
+
+      async deleteReply(threadId, replyId) {
+        if (supa) {
+          const { data: { user } } = await supa.auth.getUser();
+          if (!user) throw new Error('Sign in first (magic link email).');
+          const { error } = await supa.from('replies').delete().eq('id', replyId);
+          if (error) throw error;
+          return;
+        }
+        const threads = readLS(LS_THREADS, null) || [];
+        const t = threads.find((x) => x.id === threadId);
+        if (!t) throw new Error('Thread not found');
+        const before = (t.replies || []).length;
+        t.replies = (t.replies || []).filter((r) => r.id !== replyId);
+        if (t.replies.length === before) throw new Error('Reply not found');
+        writeLS(LS_THREADS, threads);
+      },
+
+      async nocapDelete(postId) {
+        if (supa) {
+          const { data: { user } } = await supa.auth.getUser();
+          if (!user) throw new Error('Sign in first (magic link email).');
+          const { error } = await supa.from('nocap_posts').delete().eq('id', postId);
+          if (error) throw error;
+          return;
+        }
+        const posts = readLS(LS_NOCAP, null) || NOCAP_SEEDS();
+        const next = posts.filter((p) => p.id !== postId);
+        if (next.length === posts.length) throw new Error('Post not found');
+        writeLS(LS_NOCAP, next);
       },
 
       async vote(threadId, value) {
@@ -1945,12 +2249,103 @@ Please help me choose:
         }
         writeLS(LS_VOTES, myVotes);
         writeLS(LS_THREADS, threads);
+      },
+
+      /* ============ NO CAP (social feed) ============ */
+      async nocapList() {
+        if (supa) {
+          const { data, error } = await supa
+            .from('nocap_posts')
+            .select('*, author:profiles(display_name, username), likes:nocap_likes(count)')
+            .order('created_at', { ascending: false })
+            .limit(100);
+          if (error) throw error;
+          return (data || []).map((p) => ({
+            id: p.id,
+            author: (p.author && (p.author.display_name || p.author.username)) || 'member',
+            authorId: p.author_id || null,
+            body: p.body,
+            images: p.images || [],
+            createdAt: p.created_at,
+            likes: (p.likes && p.likes[0] ? p.likes[0].count : 0)
+          }));
+        }
+        return readLS(LS_NOCAP, null) || NOCAP_SEEDS();
+      },
+
+      async nocapPost({ body, images }) {
+        const author = await authorName();
+        const pics = await uploadImages(images);
+        if (supa) {
+          const { data: { user } } = await supa.auth.getUser();
+          if (!user) throw new Error('Sign in first (magic link email).');
+          const { error } = await supa.from('nocap_posts').insert({ body, images: pics, author_id: user.id });
+          if (error) throw error;
+          return;
+        }
+        const posts = readLS(LS_NOCAP, null) || NOCAP_SEEDS();
+        posts.unshift({
+          id: 'n-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+          author, body, images: pics, createdAt: Date.now(), likes: 0
+        });
+        const saved = writeLS(LS_NOCAP, posts.slice(0, 200));
+        if (!saved) toast('Heads up: browser storage is full — image(s) kept for this session only.');
+      },
+
+      async nocapLike(postId, on) {
+        /* on = true like / false unlike. demo: local tally. supabase: toggle row. */
+        if (supa) {
+          const { data: { user } } = await supa.auth.getUser();
+          if (!user) throw new Error('Sign in first (magic link email).');
+          if (on) {
+            const { error } = await supa.from('nocap_likes').upsert(
+              { user_id: user.id, post_id: postId },
+              { onConflict: 'user_id,post_id' });
+            if (error) throw error;
+          } else {
+            const { error } = await supa.from('nocap_likes').delete().match({ user_id: user.id, post_id: postId });
+            if (error) throw error;
+          }
+          return;
+        }
+        const posts = readLS(LS_NOCAP, null) || NOCAP_SEEDS();
+        const p = posts.find((x) => x.id === postId);
+        if (!p) return;
+        const myLikes = readLS(LS_NOCAP_LIKES, {});
+        if (on && !myLikes[postId]) { p.likes = (p.likes || 0) + 1; myLikes[postId] = 1; }
+        else if (!on && myLikes[postId]) { p.likes = Math.max(0, (p.likes || 0) - 1); delete myLikes[postId]; }
+        writeLS(LS_NOCAP_LIKES, myLikes);
+        writeLS(LS_NOCAP, posts);
       }
     };
+
+    /* Demo-mode starter posts for the No Cap feed */
+    function NOCAP_SEEDS() {
+      const now = Date.now();
+      return [
+        { id: 'nc-seed-1', author: 'Big Plug', body: 'The Block just got a social feed. Pull up, say what\'s real. No cap. 🖤', images: [], createdAt: now - 20 * 60000, likes: 12 },
+        { id: 'nc-seed-2', author: 'CodeWave', body: 'Shipped my first agent today. It only books meetings but it BOOKS THEM. Small wins count.', images: [], createdAt: now - 3 * 3600000, likes: 9 },
+        { id: 'nc-seed-3', author: 'DeeCodes', body: 'Shout out to everybody posting their Ls too. We learn out loud here.', images: [], createdAt: now - 6 * 3600000, likes: 15 },
+        { id: 'nc-seed-4', author: 'Stacks', body: 'Interview loop update: passed the technical, final round Friday. Manifesting. 🙌', images: [], createdAt: now - 9 * 3600000, likes: 21 }
+      ];
+    }
 
     function seedIfEmpty() {
       writeLS(LS_THREADS, SEED_THREADS);
       return SEED_THREADS;
+    }
+
+    /* one-time fix-up: replies saved before ids existed get stable ids now */
+    function migrateReplyIds(threads) {
+      if (!Array.isArray(threads)) return threads;
+      let changed = false;
+      threads.forEach((t) => {
+        (t.replies || []).forEach((r) => {
+          if (!r.id) { r.id = 'r-' + (t.id || 'x') + '-' + (r.createdAt || Date.now()) + '-' + Math.floor(Math.random() * 1000); changed = true; }
+        });
+      });
+      if (changed) writeLS(LS_THREADS, threads);
+      return threads;
     }
 
     /* ============ STATE + RENDER ============ */
@@ -1994,7 +2389,14 @@ Please help me choose:
             const email = input.value.trim();
             if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { toast('Enter a real email.'); return; }
             btn.disabled = true; btn.textContent = 'Sending…';
-            const { error } = await supa.auth.signInWithOtp({ email });
+            let { error } = await supa.auth.signInWithOtp({
+              email,
+              options: { emailRedirectTo: window.location.origin }
+            });
+            if (error && /redirect/i.test(error.message || '')) {
+              /* this origin isn't on the allowlist yet - fall back to the project's Site URL */
+              ({ error } = await supa.auth.signInWithOtp({ email }));
+            }
             btn.disabled = false; btn.textContent = 'Sign in';
             if (error) { toast('Something went wrong. Try again.'); return; }
             const sent = document.getElementById('forum-sent');
@@ -2016,6 +2418,103 @@ Please help me choose:
           }
         });
       }
+    }
+
+    /* ============ NO CAP FEED ============ */
+    const nocap = {
+      posts: [],
+      feed: document.getElementById('nocap-feed'),
+      count: document.getElementById('nocap-count'),
+      avatar: document.getElementById('nocap-avatar'),
+      text: document.getElementById('nocap-text'),
+      chars: document.getElementById('nocap-chars'),
+      btn: document.getElementById('nocap-post-btn')
+    };
+
+    function nocapAuthor() {
+      if (supa) {
+        return supa.auth.getUser().then(({ data: { user } }) =>
+          (user && user.email) ? user.email.split('@')[0] : readLS(LS_HANDLE, 'NewComer'));
+      }
+      return Promise.resolve(readLS(LS_HANDLE, 'NewComer'));
+    }
+
+    function renderNocapAvatar() {
+      if (!nocap.avatar) return;
+      nocapAuthor().then((name) => {
+        nocap.avatar.textContent = (name || '?').slice(0, 1).toUpperCase();
+        nocap.avatar.title = 'Posting as ' + name;
+      });
+    }
+
+    function renderNocapFeed() {
+      if (!nocap.feed) return;
+      const myLikes = readLS(LS_NOCAP_LIKES, {});
+      nocap.count.textContent = nocap.posts.length + ' post' + (nocap.posts.length === 1 ? '' : 's');
+      if (!nocap.posts.length) {
+        nocap.feed.innerHTML = nocap.tablesMissing
+          ? '<div class="nocap-empty">Feed tables not set up yet — run <code>supabase-setup.sql</code> in your project\'s SQL editor, then reload.</div>'
+          : '<div class="nocap-empty">Quiet in here. Drop the first post — no cap.</div>';
+        return;
+      }
+      nocap.feed.innerHTML = nocap.posts.map((p) =>
+        '<div class="nocap-post" data-post="' + esc(p.id) + '">' +
+          '<div class="nocap-post-head">' +
+            '<span class="nocap-post-author">' + esc(p.author) + '</span>' +
+            '<span class="nocap-post-time">· ' + timeAgo(p.createdAt) + '</span>' +
+          '</div>' +
+          '<div class="nocap-post-body">' + esc(p.body) + '</div>' +
+          picsMarkup(p.images, false) +
+          '<div class="nocap-post-actions">' +
+            '<button type="button" class="nocap-like' + (myLikes[p.id] ? ' liked' : '') + '" data-like="' + esc(p.id) + '" data-on="' + (myLikes[p.id] ? '0' : '1') + '" aria-label="Like post">' +
+              '💙 ' + (p.likes || 0) +
+            '</button>' +
+            (nocapMine(p)
+              ? '<button type="button" class="delete-btn nocap-delete" data-del-nocap="' + esc(p.id) + '" title="Delete this post" aria-label="Delete this post">🗑</button>'
+              : '') +
+          '</div>' +
+        '</div>'
+      ).join('');
+
+      nocap.feed.querySelectorAll('.nocap-delete').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('Delete this post? This can\'t be undone.')) return;
+          const pc = btn.closest('.nocap-post');
+          if (pc) { pc.style.opacity = '.45'; pc.style.pointerEvents = 'none'; }
+          try {
+            await Store.nocapDelete(btn.dataset.delNocap);
+            toast('Post deleted.');
+            await loadNocap();
+            renderNocapFeed();
+          } catch (err) {
+            if (pc) { pc.style.opacity = ''; pc.style.pointerEvents = ''; }
+            toast(err.message || 'Could not delete that post.');
+          }
+        });
+      });
+      nocap.feed.querySelectorAll('.nocap-like').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          try {
+            await Store.nocapLike(btn.dataset.like, btn.dataset.on === '1');
+            await loadNocap();
+            renderNocapFeed();
+          } catch (err) { toast(err.message || 'Could not like that.'); }
+        });
+      });
+      nocap.feed.querySelectorAll('[data-pic]').forEach((pic) => {
+        pic.addEventListener('click', () => openLightbox(pic.dataset.pic));
+      });
+    }
+
+    async function loadNocap() {
+      try {
+        nocap.posts = await Store.nocapList();
+        nocap.tablesMissing = false;
+      } catch (err) {
+        nocap.posts = [];
+        nocap.tablesMissing = !!(supa && err && /Could not find|schema cache|does not exist/i.test(String(err.message || '')));
+      }
+      return nocap.posts;
     }
 
     function renderCategoryPills() {
@@ -2075,22 +2574,45 @@ Please help me choose:
                 '<span>by <span class="thread-author">' + esc(t.author) + '</span></span>' +
                 '<span class="thread-date">' + timeAgo(t.createdAt) + '</span>' +
                 picsMarkup(t.images, true) +
+                '<span class="views-chip">👁 <b>' + fmtViews(t.views || 0) + '</b> views</span>' +
               '</div>' +
               '<h3>' + esc(t.title) + '</h3>' +
               '<p>' + esc(t.body.slice(0, 160)) + (t.body.length > 160 ? '…' : '') + '</p>' +
             '</div>' +
-            '<div class="thread-side"><span class="reply-count">💬 ' + (t.replyCount || 0) + '</span><span>replies</span></div>' +
+            '<div class="thread-side">' +
+              '<span class="reply-count">💬 ' + (t.replyCount || 0) + '</span><span>replies</span>' +
+              (threadMine(t)
+                ? '<button type="button" class="delete-btn thread-delete" data-del-thread="' + esc(t.id) + '" title="Delete this post" aria-label="Delete this post">🗑</button>'
+                : '') +
+            '</div>' +
           '</article>'
         );
       }).join('') + '</div>';
 
       els.view.querySelectorAll('.thread-card').forEach((card) => {
         card.addEventListener('click', (e) => {
-          if (e.target.closest('[data-vote]')) return;
+          if (e.target.closest('[data-vote]') || e.target.closest('.thread-delete')) return;
           openThread(card.dataset.thread);
         });
         card.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openThread(card.dataset.thread); }
+        });
+        card.querySelectorAll('.thread-delete').forEach((btn) => {
+          btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            if (!confirm('Delete this post? This can\'t be undone.')) return;
+            const btnCard = btn.closest('.thread-card');
+            if (btnCard) { btnCard.style.opacity = '.45'; btnCard.style.pointerEvents = 'none'; }
+            try {
+              await Store.deleteThread(btn.dataset.delThread);
+              toast('Post deleted.');
+              await loadThreads();
+              renderThreadList();
+            } catch (err) {
+              if (btnCard) { btnCard.style.opacity = ''; btnCard.style.pointerEvents = ''; }
+              toast(err.message || 'Could not delete that post.');
+            }
+          });
         });
         card.querySelectorAll('[data-vote]').forEach((btn) => {
           btn.addEventListener('click', async (e) => {
@@ -2127,6 +2649,10 @@ Please help me choose:
             '<span>by <span class="thread-author">' + esc(thread.author) + '</span></span>' +
             '<span class="thread-date">' + timeAgo(thread.createdAt) + '</span>' +
             (thread.pinned ? '<span class="pin-flag">📌 pinned</span>' : '') +
+            '<span class="views-chip">👁 <b id="thread-views-count" data-v="' + (thread.views || 0) + '">' + fmtViews(thread.views || 0) + '</b> views</span>' +
+            (threadMine(thread)
+              ? '<button type="button" class="delete-btn thread-delete" id="thread-delete" title="Delete this post" aria-label="Delete this post">🗑 Delete post</button>'
+              : '') +
           '</div>' +
           '<h2>' + esc(thread.title) + '</h2>' +
           '<div class="view-body">' + esc(thread.body) + '</div>' +
@@ -2135,8 +2661,12 @@ Please help me choose:
             '<p class="replies-label">// ' + replies.length + ' repl' + (replies.length === 1 ? 'y' : 'ies') + '</p>' +
             (replies.length
               ? replies.map((r) =>
-                  '<div class="reply-card">' +
-                    '<div class="reply-meta"><strong>' + esc(r.author) + '</strong><span>' + timeAgo(r.createdAt) + '</span></div>' +
+                  '<div class="reply-card" data-reply="' + esc(r.id || '') + '">' +
+                    '<div class="reply-meta"><strong>' + esc(r.author) + '</strong><span>' + timeAgo(r.createdAt) + '</span>' +
+                    (replyMine(r) && r.id
+                      ? '<button type="button" class="delete-btn reply-delete" data-del-reply="' + esc(r.id) + '" title="Delete this reply" aria-label="Delete this reply">🗑</button>'
+                      : '') +
+                    '</div>' +
                     '<p class="reply-body">' + esc(r.body) + '</p>' +
                     picsMarkup(r.images, false) +
                   '</div>').join('')
@@ -2152,6 +2682,36 @@ Please help me choose:
       document.getElementById('forum-back').addEventListener('click', () => {
         state.threadId = null;
         renderThreadList();
+      });
+      const delThreadBtn = document.getElementById('thread-delete');
+      if (delThreadBtn) delThreadBtn.addEventListener('click', async () => {
+        if (!confirm('Delete this whole post and its replies? This can\'t be undone.')) return;
+        delThreadBtn.disabled = true;
+        try {
+          await Store.deleteThread(state.threadId);
+          state.threadId = null;
+          toast('Post deleted.');
+          await loadThreads();
+          renderThreadList();
+        } catch (err) {
+          delThreadBtn.disabled = false;
+          toast(err.message || 'Could not delete that post.');
+        }
+      });
+      els.view.querySelectorAll('.reply-delete').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('Delete this reply? This can\'t be undone.')) return;
+          const rc = btn.closest('.reply-card');
+          if (rc) { rc.style.opacity = '.45'; rc.style.pointerEvents = 'none'; }
+          try {
+            await Store.deleteReply(state.threadId, btn.dataset.delReply);
+            toast('Reply deleted.');
+            await openThread(state.threadId);
+          } catch (err) {
+            if (rc) { rc.style.opacity = ''; rc.style.pointerEvents = ''; }
+            toast(err.message || 'Could not delete that reply.');
+          }
+        });
       });
       const replyAttach = makeAttachWidget('reply-attach', null);
       document.getElementById('reply-form').addEventListener('submit', async (e) => {
@@ -2170,11 +2730,20 @@ Please help me choose:
         if (pic) openLightbox(pic.dataset.pic);
       });
       els.view.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      bumpThreadViews(id);
     }
 
     async function loadThreads() {
       try { state.threads = await Store.listThreads(); }
-      catch (err) { state.threads = []; }
+      catch (err) {
+        state.threads = [];
+        /* live mode + missing tables -> tell the owner to run the setup SQL */
+        if (supa && err && /Could not find|schema cache|does not exist/i.test(String(err.message || ''))) {
+          els.note.innerHTML = 'Supabase is connected, but the forum tables aren’t set up yet. Open the SQL editor in your Supabase project, run <code>supabase-setup.sql</code> (it ships with this site), then reload this page.';
+          els.note.removeAttribute('hidden');
+        }
+      }
+      return state.threads;
     }
 
     /* ============ NEW THREAD FORM ============ */
@@ -2217,6 +2786,45 @@ Please help me choose:
       }
     });
 
+    /* ============ NO CAP COMPOSER ============ */
+    const nocapAttach = makeAttachWidget('nocap-attach', null);
+
+    if (nocap.text) {
+      const updateChars = () => {
+        const left = 280 - nocap.text.value.length;
+        nocap.chars.textContent = left;
+        nocap.chars.classList.toggle('low', left < 30);
+      };
+      nocap.text.addEventListener('input', updateChars);
+      updateChars();
+
+      const postIt = async () => {
+        const body = nocap.text.value.trim();
+        if (!body) { toast('Say something first. No cap.'); return; }
+        const imgs = nocapAttach.getImages();
+        if (imgs.length > 1) { toast('One image per post, family.'); return; }
+        nocap.btn.disabled = true; nocap.btn.textContent = 'Posting…';
+        try {
+          await Store.nocapPost({ body, images: imgs });
+          nocap.text.value = '';
+          nocapAttach.clear();
+          updateChars();
+          toast('Posted. No cap 🖤');
+          await loadNocap();
+          renderNocapFeed();
+        } catch (err) {
+          toast(err.message || 'Could not post that.');
+        } finally {
+          nocap.btn.disabled = false;
+          nocap.btn.textContent = 'Post it →';
+        }
+      };
+      nocap.btn.addEventListener('click', postIt);
+      nocap.text.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); postIt(); }
+      });
+    }
+
     /* ============ NAV LINKS -> reset to list view ============ */
     document.querySelectorAll('a[href="#forum"]').forEach((a) => {
       a.addEventListener('click', () => {
@@ -2229,13 +2837,34 @@ Please help me choose:
     if (!supa) els.note.removeAttribute('hidden');
     renderAuth();
     renderCategoryPills();
-    loadThreads().then(renderThreadList);
+    refreshMe().then(() => {
+      loadThreads().then(renderThreadList);
+      loadNocap().then(renderNocapFeed);
+    });
+    bumpSiteViews();
+    renderNocapAvatar();
+
+    /* Auth events -> keep the sign-in box + "mine" buttons fresh */
+    if (supa) {
+      supa.auth.onAuthStateChange((event, session) => {
+        if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+          renderAuth();
+          refreshMe().then(() => {
+            loadNocap().then(renderNocapFeed);
+            if (!state.threadId) loadThreads().then(renderThreadList);
+          });
+        }
+      });
+    }
 
     /* Optional: live updates in supabase mode */
     if (supa) {
       supa.channel('the-block-forum')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'threads' }, () => {
           loadThreads().then(() => { if (!state.threadId) renderThreadList(); });
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'nocap_posts' }, () => {
+          loadNocap().then(renderNocapFeed);
         })
         .on('postgres_changes', { event: '*', schema: 'public', table: 'replies' }, () => {
           if (state.threadId) openThread(state.threadId);

@@ -11,6 +11,24 @@ Every change to The Block, newest first. This project doesn't do surprise rewrit
 - Notification stack improvements
 - Keyboard shortcuts for power users
 
+## [0.5.0] — 2026
+
+### Fixed
+
+- **Voting, for real.** Up/down votes in live mode were hardcoded to zero and the "you voted" highlight only read the demo-mode store, so live voting looked dead. Live mode now fetches every vote, sums it in the browser, marks your own vote, and clicking the arrow you already voted removes the vote entirely (toggle off). The server doesn't support aggregate queries, so the math is done client-side on the raw vote rows.
+- **Usernames on posts.** New "Post as" field on the thread composer and the reply box. Pick a name once and it's saved to your profile in live mode (or to the browser in demo mode), pre-filled next time, and shown as the author on your posts and in the header strip instead of your raw email.
+
+### Changed
+
+- **Image previews on thread cards.** Cards used to show only a "🖼 N" chip when a post had images; now they show real thumbnail previews of each image plus the chip.
+- **Full-size images in post detail.** The post view capped images at a small box; images now render up to 640px wide at full aspect ratio (still tappable to open the lightbox for the original).
+- **View count moved to the end of the post card.** The reply count now sits with the date in the card's meta row and the view count closes out the card's right edge, as requested.
+- **Top navigation strip restored.** Removed in v0.4.0, back by popular demand in v0.5.0 with all eight section links, a mobile menu button, and dark-theme link colors that actually work. The hero stats read the honest numbers: 9 rooms, 1 file, 0 build steps.
+
+### Security
+
+- Confirmed (again) that no frontend file contains the `sb_secret_…` key — only the publishable key ships in HTML.
+
 ## [0.4.0] — 2026
 
 ### Added
@@ -23,7 +41,7 @@ Every change to The Block, newest first. This project doesn't do surprise rewrit
 
 ### Changed
 
-- **Removed the top navigation strip and the "15 ROOMS 15 TABS" marketing stat.** The forum has nine rooms, not fifteen; the strip overstated it and half its links pointed at sections that didn't earn their slot. Navigation now runs through the room tabs, footer links, and in-page CTAs — all of which go somewhere real. [FAQ.md](docs/FAQ.md#why-did-the-top-nav-go-away)
+- **Removed the top navigation strip and the "15 ROOMS 15 TABS" marketing stat.** The forum has nine rooms, not fifteen; the strip overstated it and half its links pointed at sections that didn't earn their slot. Navigation now runs through the room tabs, footer links, and in-page CTAs — all of which go somewhere real. (Restored in v0.5.0.)
 - Rewrote **README.md** as a proper front page for the repository — what it is, quick start, file map, rooms table, auth summary, and links to every doc.
 - Supabase client config hardened: PKCE flow, session persistence, auto token refresh, URL session detection.
 

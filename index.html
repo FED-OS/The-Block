@@ -132,6 +132,15 @@
       transform: rotate(-6deg);
       box-shadow: 0 0 22px rgba(198,255,61,.42);
     }
+    .nav-toggle {
+      display: none;
+      padding: .5rem .75rem;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: var(--surface);
+      cursor: pointer;
+    }
     .theme-toggle {
       display: inline-flex;
       align-items: center;
@@ -147,6 +156,19 @@
       font-weight: 700;
     }
     .theme-toggle:hover { color: var(--green-dark); border-color: var(--green); }
+    .site-nav { display: flex; align-items: center; gap: .25rem; }
+    .site-nav a {
+      padding: .55rem .75rem;
+      border-radius: 8px;
+      color: #3b474e;
+      text-decoration: none;
+      font-size: .94rem;
+      font-weight: 650;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .site-nav a:hover, .site-nav a:focus-visible { color: var(--green-dark); background: var(--green-light); }
+    [data-theme="dark"] .site-nav a { color: var(--ink); }
 
     .hero {
       position: relative;
@@ -624,6 +646,8 @@
       white-space: nowrap;
     }
     .thread-side .reply-count { color: var(--cyan); font-weight: 700; }
+    .thread-meta .reply-count { color: var(--cyan); font-weight: 700; }
+    .thread-side .views-chip b { color: var(--cyan); }
 
     .forum-view {
       padding: 1.5rem;
@@ -736,6 +760,7 @@
     }
     .new-thread-form select { cursor: pointer; }
     .new-thread-form textarea { min-height: 130px; resize: vertical; }
+    .reply-form input { padding: .6rem .8rem; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink); font: inherit; width: 100%; max-width: 320px; }
     .new-thread-form input:focus,
     .new-thread-form select:focus,
     .new-thread-form textarea:focus {
@@ -849,6 +874,14 @@
       font-size: .66rem;
       white-space: nowrap;
     }
+    .card-pics { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; margin-top: .35rem; }
+    .card-pics img {
+      width: 54px; height: 54px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+    }
+    .card-pics .pics-chip { margin-left: .15rem; }
     .post-images { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1rem 0 .25rem; }
     .post-images button {
       padding: 0;
@@ -860,7 +893,8 @@
       transition: border-color .15s ease, transform .15s ease;
     }
     .post-images button:hover, .post-images button:focus-visible { border-color: var(--acid); transform: translateY(-2px); }
-    .post-images img { display: block; max-width: 260px; max-height: 190px; object-fit: cover; }
+    .post-images img { display: block; width: 100%; max-width: 640px; max-height: 560px; object-fit: contain; border-radius: 10px; background: rgba(0,0,0,.25); }
+    .post-images button { max-width: 100%; }
 
     /* ---- lightbox ---- */
     .forum-lightbox {
@@ -1130,6 +1164,23 @@
 
     @media (max-width: 760px) {
       .header-inner { min-height: 64px; }
+      .nav-toggle { display: inline-flex; }
+      .site-nav {
+        display: none;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: .2rem;
+        padding: .75rem 1rem 1rem;
+        border-bottom: 1px solid var(--line);
+        background: var(--paper);
+        z-index: 50;
+      }
+      .site-nav[data-open="true"] { display: flex; }
+      .site-nav a { padding: .7rem; }
       .hero, .section { padding: 3.75rem 0; }
       .hero-stage { grid-template-columns: 1fr; gap: 1.5rem; }
       .hero-art { min-height: 310px; }
@@ -1150,7 +1201,7 @@
       .role-grid { grid-template-columns: 1fr; }
       .blm-process { grid-template-columns: repeat(2, 1fr); }
       .blm-banner .blm-motto { margin-left: 0; }
-      .post-images img { max-width: 150px; max-height: 120px; }
+      .post-images img { max-width: 100%; max-height: 380px; }
       .nocap-composer { flex-direction: column; }
       .nocap-post .post-images img { max-width: 150px; max-height: 120px; }
     }
@@ -1170,10 +1221,22 @@
         <span class="brand-mark" aria-hidden="true">B</span>
         <span>The Block</span>
       </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
       <button class="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to dark mode">
         <span aria-hidden="true">☾</span><span class="theme-toggle-label">Dark mode</span>
       </button>
           </div>
+      <nav class="site-nav" id="site-nav" aria-label="Main navigation" data-open="false">
+        <a href="#start">Start here</a>
+        <a href="#resources">The good stuff</a>
+        <a href="#how-it-works">How to get moving</a>
+        <a href="#community">The crew</a>
+        <a href="#forum">The Forum</a>
+        <a href="#nocap">No Cap</a>
+        <a href="#blm">Black Leaders Mgmt</a>
+        <a href="#support">FAQ</a>
+      </nav>
+    </div>
   </header>
 
   <main id="main-content">
@@ -1386,6 +1449,7 @@ Please help me choose:
             <h3>Start a new thread</h3>
             <form class="new-thread-form" id="new-thread-form">
               <select id="thread-category" required aria-label="Pick a room"></select>
+              <input type="text" id="thread-author" placeholder="Post as — pick your name (saved for next time)" maxlength="24" autocomplete="off" aria-label="Your username">
               <input type="text" id="thread-title" placeholder="Thread title" required maxlength="140">
               <textarea id="thread-body" placeholder="Say what you're trying to do, what you tried, and what you need. Keep it real." required></textarea>
               <div class="attach-box" id="thread-attach"></div>
@@ -1572,6 +1636,8 @@ Please help me choose:
   </dialog>
 
   <script>
+    const menuButton = document.querySelector('.nav-toggle');
+    const navigation = document.querySelector('.site-nav');
     const themeButton = document.querySelector('.theme-toggle');
     const themeLabel = document.querySelector('.theme-toggle-label');
     const infoDialog = document.getElementById('info-dialog');
@@ -1615,6 +1681,21 @@ Please help me choose:
       document.documentElement.dataset.theme = darkMode ? 'dark' : 'light';
       localStorage.setItem('the-block-theme', darkMode ? 'dark' : 'light');
       updateThemeButton();
+    });
+
+    menuButton.addEventListener('click', () => {
+      const isOpen = navigation.dataset.open === 'true';
+      navigation.dataset.open = String(!isOpen);
+      menuButton.setAttribute('aria-expanded', String(!isOpen));
+      menuButton.textContent = isOpen ? 'Menu' : 'Close';
+    });
+
+    navigation.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        navigation.dataset.open = 'false';
+        menuButton.setAttribute('aria-expanded', 'false');
+        menuButton.textContent = 'Menu';
+      });
     });
 
     document.querySelectorAll('[data-copy]').forEach((button) => {
@@ -1951,7 +2032,9 @@ Please help me choose:
     function picsMarkup(list, chipOnly) {
       const pics = (list || []).filter(Boolean);
       if (!pics.length) return '';
-      if (chipOnly) return '<span class="pics-chip">🖼 ' + pics.length + ' pic' + (pics.length === 1 ? '' : 's') + '</span>';
+      if (chipOnly) return '<div class="card-pics">' + pics.map((p) =>
+        '<img src="' + esc(p) + '" alt="' + pics.length + ' image' + (pics.length === 1 ? '' : 's') + ' in this post" loading="lazy">'
+      ).join('') + '<span class="pics-chip">🖼 ' + pics.length + '</span></div>';
       return '<div class="post-images">' + pics.map((p) =>
         '<button type="button" data-pic="' + esc(p) + '" aria-label="View image"><img src="' + esc(p) + '" alt="posted image"></button>'
       ).join('') + '</div>';
@@ -1968,10 +2051,42 @@ Please help me choose:
     const authorName = async () => {
       if (supa) {
         const { data: { user } } = await supa.auth.getUser();
-        if (user) return user.email ? user.email.split('@')[0] : 'member';
+        if (user) {
+          const { data: profile } = await supa.from('profiles')
+            .select('display_name, username').eq('id', user.id).maybeSingle();
+          if (profile && (profile.display_name || profile.username))
+            return profile.display_name || profile.username;
+          return user.email ? user.email.split('@')[0] : 'member';
+        }
+        return 'member';
       }
       return readLS(LS_HANDLE, null) || 'NewComer';
     };
+
+    /* save the name the crew sees (profiles.display_name live / LS_HANDLE demo) */
+    async function saveHandle(raw) {
+      const clean = String(raw || '').trim().slice(0, 24);
+      if (!clean) throw new Error('Name can\'t be empty.');
+      if (supa) {
+        const { data: { user } } = await supa.auth.getUser();
+        if (!user) throw new Error('Sign in first (email + password).');
+        const { data: existing } = await supa.from('profiles')
+          .select('id').eq('id', user.id).maybeSingle();
+        if (existing) {
+          const { error } = await supa.from('profiles')
+            .update({ display_name: clean }).eq('id', user.id);
+          if (error) throw error;
+        } else {
+          const { error } = await supa.from('profiles')
+            .insert({ id: user.id, display_name: clean });
+          if (error) throw error;
+        }
+        return clean;
+      }
+      writeLS(LS_HANDLE, clean);
+      if (typeof renderNocapAvatar === 'function') renderNocapAvatar();
+      return clean;
+    }
 
     /* who is looking at the page right now (refreshed at boot + on auth events) */
     let me = null;
@@ -2017,17 +2132,25 @@ Please help me choose:
         if (supa) {
           const { data, error } = await supa
             .from('threads')
-            .select('*, author:profiles(display_name, username), category:categories(slug), replies(count)')
+            .select('*, author:profiles(display_name, username), category:categories(slug), replies(count), thread_votes(value, user_id)')
             .order('pinned', { ascending: false })
             .order('created_at', { ascending: false });
           if (error) throw error;
-          return data.map((t) => ({
+          return data.map((t) => {
+            const vs = t.thread_votes || [];
+            let vSum = 0, myV = 0;
+            vs.forEach((v) => {
+              vSum += v.value;
+              if (me && v.user_id === me.id) myV = v.value;
+            });
+            return {
             id: t.id,
             categoryId: t.category ? t.category.slug : 'front-door',
             author: (t.author && (t.author.display_name || t.author.username)) || 'member',
             authorId: t.author_id || null,
             pinned: !!t.pinned,
-            votes: 0,
+            votes: vSum,
+            myVote: myV,
             views: t.views || 0,
             title: t.title,
             body: t.body,
@@ -2035,7 +2158,8 @@ Please help me choose:
             images: t.images || [],
             replyCount: t.replies && t.replies[0] ? t.replies[0].count : 0,
             replies: null
-          }));
+            };
+          });
         }
         return migrateReplyIds(readLS(LS_THREADS, null) || seedIfEmpty());
       },
@@ -2043,17 +2167,24 @@ Please help me choose:
       async getThread(id) {
         if (supa) {
           const { data: thread, error } = await supa
-            .from('threads').select('*, author:profiles(display_name, username), category:categories(slug)').eq('id', id).single();
+            .from('threads').select('*, author:profiles(display_name, username), category:categories(slug), thread_votes(value, user_id)').eq('id', id).single();
           if (error) throw error;
           const { data: replies } = await supa
             .from('replies').select('*, author:profiles(display_name, username)').eq('thread_id', id).order('created_at');
+          const vs = thread.thread_votes || [];
+          let vSum = 0, myV = 0;
+          vs.forEach((v) => {
+            vSum += v.value;
+            if (me && v.user_id === me.id) myV = v.value;
+          });
           return {
             id: thread.id,
             categoryId: thread.category ? thread.category.slug : 'front-door',
             author: (thread.author && (thread.author.display_name || thread.author.username)) || 'member',
             authorId: thread.author_id || null,
             pinned: !!thread.pinned,
-            votes: 0,
+            votes: vSum,
+            myVote: myV,
             views: thread.views || 0,
             title: thread.title,
             body: thread.body,
@@ -2168,6 +2299,14 @@ Please help me choose:
         if (supa) {
           const { data: { user } } = await supa.auth.getUser();
           if (!user) throw new Error('Sign in first (email + password).');
+          const { data: mine } = await supa.from('thread_votes')
+            .select('value').eq('user_id', user.id).eq('thread_id', threadId).maybeSingle();
+          if (mine && mine.value === value) {          /* same arrow again = take it back */
+            const { error } = await supa.from('thread_votes')
+              .delete().eq('user_id', user.id).eq('thread_id', threadId);
+            if (error) throw error;
+            return;
+          }
           const { error } = await supa.from('thread_votes')
             .upsert({ user_id: user.id, thread_id: threadId, value },
                     { onConflict: 'user_id,thread_id' });
@@ -2306,10 +2445,17 @@ Please help me choose:
     /* email + password auth: mode is 'signin' | 'signup' */
     function renderAuth() {
       if (supa) {
-        supa.auth.getUser().then(({ data: { user } }) => {
+        supa.auth.getUser().then(async ({ data: { user } }) => {
           if (user) {
+            let shown = user.email ? user.email.split('@')[0] : user.email;
+            try {
+              const { data: profile } = await supa.from('profiles')
+                .select('display_name, username').eq('id', user.id).maybeSingle();
+              if (profile && (profile.display_name || profile.username))
+                shown = profile.display_name || profile.username;
+            } catch (e) { /* profile read is nice-to-have */ }
             els.auth.innerHTML =
-              'Posting as <strong>' + esc(user.email) + '</strong> ' +
+              'Posting as <strong>' + esc(shown) + '</strong> ' +
               '<button type="button" id="forum-signout">sign out</button>';
             const out = document.getElementById('forum-signout');
             if (out) out.addEventListener('click', async () => {
@@ -2513,7 +2659,7 @@ Please help me choose:
 
       els.view.innerHTML = '<div class="thread-list">' + threads.map((t) => {
         const c = catById(t.categoryId);
-        const my = myVotes[t.id];
+        const my = (typeof t.myVote === 'number' && t.myVote) ? t.myVote : (myVotes[t.id] || 0);
         return (
           '<article class="thread-card' + (t.pinned ? ' pinned' : '') + '" data-thread="' + esc(t.id) + '" tabindex="0" role="button">' +
             '<div class="thread-votes">' +
@@ -2528,13 +2674,13 @@ Please help me choose:
                 '<span>by <span class="thread-author">' + esc(t.author) + '</span></span>' +
                 '<span class="thread-date">' + timeAgo(t.createdAt) + '</span>' +
                 picsMarkup(t.images, true) +
-                '<span class="views-chip">👁 <b>' + fmtViews(t.views || 0) + '</b> views</span>' +
+                '<span class="reply-count">💬 ' + (t.replyCount || 0) + '</span><span class="thread-date">repl' + ((t.replyCount || 0) === 1 ? 'y' : 'ies') + '</span>' +
               '</div>' +
               '<h3>' + esc(t.title) + '</h3>' +
               '<p>' + esc(t.body.slice(0, 160)) + (t.body.length > 160 ? '…' : '') + '</p>' +
             '</div>' +
             '<div class="thread-side">' +
-              '<span class="reply-count">💬 ' + (t.replyCount || 0) + '</span><span>replies</span>' +
+              '<span class="views-chip">👁 <b>' + fmtViews(t.views || 0) + '</b> views</span>' +
               (threadMine(t)
                 ? '<button type="button" class="delete-btn thread-delete" data-del-thread="' + esc(t.id) + '" title="Delete this post" aria-label="Delete this post">🗑</button>'
                 : '') +
@@ -2626,6 +2772,7 @@ Please help me choose:
                   '</div>').join('')
               : '<p style="color:var(--muted);font-size:.9rem">Quiet in here. Be the first to answer.</p>') +
             '<form class="reply-form" id="reply-form">' +
+              '<input type="text" id="reply-author" placeholder="Post as — pick your name" maxlength="24" autocomplete="off" aria-label="Your username">' +
               '<textarea id="reply-body" placeholder="Drop your answer. Keep it kind, keep it real." required></textarea>' +
               '<div class="attach-box" id="reply-attach"></div>' +
               '<div class="button-row"><button type="submit" class="button button--primary">Post reply</button></div>' +
@@ -2668,11 +2815,17 @@ Please help me choose:
         });
       });
       const replyAttach = makeAttachWidget('reply-attach', null);
+      const replyNameIn = document.getElementById('reply-author');
+      if (replyNameIn && !replyNameIn.value) {
+        authorName().then((n) => { if (replyNameIn && !replyNameIn.value) replyNameIn.value = n; });
+      }
       document.getElementById('reply-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const body = document.getElementById('reply-body').value.trim();
         if (!body) return;
+        const chosenName = replyNameIn ? replyNameIn.value.trim() : '';
         try {
+          if (chosenName) { try { await saveHandle(chosenName); renderAuth(); } catch (e) { toast(e.message || 'Could not save that name.'); } }
           await Store.createReply(id, body, replyAttach.getImages());
           toast('Reply posted. Salute 🤝');
           openThread(id);
@@ -2708,6 +2861,11 @@ Please help me choose:
       if (show) {
         els.form.removeAttribute('hidden');
         renderNewThreadSelect();
+        const nameIn = document.getElementById('thread-author');
+        if (nameIn && !nameIn.value) {
+          nameIn.value = '';
+          authorName().then((n) => { if (nameIn && !nameIn.value) nameIn.value = n; });
+        }
         document.getElementById('thread-title').focus();
       } else {
         els.form.setAttribute('hidden', '');
@@ -2722,7 +2880,10 @@ Please help me choose:
       const body = document.getElementById('thread-body').value.trim();
       const categoryId = document.getElementById('thread-category').value;
       if (!title || !body) return;
+      const nameIn = document.getElementById('thread-author');
+      const chosenName = nameIn ? nameIn.value.trim() : '';
       try {
+        if (chosenName) { try { await saveHandle(chosenName); renderAuth(); } catch (e) { toast(e.message || 'Could not save that name.'); } }
         await Store.createThread({ title, body, categoryId, images: threadAttach.getImages() });
         document.getElementById('thread-title').value = '';
         document.getElementById('thread-body').value = '';

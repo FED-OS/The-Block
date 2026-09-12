@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Authorize access — The Block</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='56' height='56' rx='12' fill='%2355bd87' transform='rotate(-8 32 32)'/%3E%3Ctext x='32' y='44' font-family='Arial Black,Arial' font-size='34' font-weight='900' fill='%23fff' text-anchor='middle'%3EB%3C/text%3E%3C/svg%3E" />
+<style>
+  * { box-sizing: border-box; }
+  :root {
+    --paper: #111916; --surface: #1a2420; --line: #2c3a34;
+    --ink: #eef6f0; --muted: #9ab3a6;
+    --green: #55bd87; --green-dark: #2f7d5a;
+    --acid: #c6ff3d; --err: #ff7d92;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    --sans: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  }
+  body {
+    margin: 0; min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    background:
+      radial-gradient(1100px 500px at 85% -10%, rgba(85,189,135,.16), transparent 60%),
+      radial-gradient(900px 460px at -10% 110%, rgba(198,255,61,.07), transparent 55%),
+      var(--paper);
+    color: var(--ink); font-family: var(--sans); padding: 1.5rem;
+  }
+  .wrap { width: 100%; max-width: 460px; }
+  .brand-row { display: flex; align-items: center; gap: .6rem; justify-content: center; margin-bottom: 1.1rem; }
+  .brand-mark {
+    width: 40px; height: 40px; flex: none; display: grid; place-items: center;
+    background: var(--green); color: #fff; font-weight: 900; font-size: 1.35rem;
+    border-radius: 10px; transform: rotate(-8deg);
+    box-shadow: 0 0 22px rgba(85,189,135,.45);
+  }
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 18px; padding: 1.75rem;
+    box-shadow: 0 18px 50px rgba(0,0,0,.45);
+  }
+  h1 { margin: 0 0 .4rem; font-size: 1.4rem; }
+  p { margin: 0 0 1rem; font-size: .92rem; color: var(--muted); line-height: 1.5; }
+  .client { font-weight: 700; color: var(--ink); }
+  .scope-box {
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: 12px; padding: .9rem 1rem; margin: 0 0 1.25rem;
+  }
+  .scope-title {
+    font-size: .7rem; font-weight: 700; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: .5rem;
+  }
+  ul { margin: 0; padding: 0; list-style: none; }
+  li { font-family: var(--mono); font-size: .78rem; color: var(--ink); padding: .22rem 0; }
+  li::before { content: "▸ "; color: var(--green); }
+  .actions { display: flex; gap: .7rem; }
+  .actions button {
+    flex: 1; padding: .78rem 1rem; border: none; border-radius: 10px;
+    font-family: var(--sans); font-size: .95rem; font-weight: 700; cursor: pointer;
+  }
+  .approve { background: var(--acid); color: #0c130f; }
+  .approve:hover:not(:disabled) { filter: brightness(1.08); }
+  .deny { background: none; border: 1px solid var(--line); color: var(--ink); }
+  .deny:hover:not(:disabled) { border-color: var(--err); color: var(--err); }
+  button:disabled { opacity: .55; cursor: not-allowed; }
+  .alert { padding: .65rem .8rem; border-radius: 10px; font-size: .8rem; margin-bottom: 1rem; display: none; line-height: 1.4; }
+  .alert.show { display: block; }
+  .alert.err { background: rgba(255,125,146,.1); color: var(--err); border: 1px solid rgba(255,125,146,.35); }
+  .hidden { display: none !important; }
+  .muted { color: var(--muted); font-size: .8rem; }
+</style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand-row">
+    <div class="brand-mark" aria-hidden="true">B</div>
+    <span>The Block</span>
+  </div>
+
+  <div class="card">
+    <div id="loading" class="muted">Loading authorization request&hellip;</div>
+
+    <div id="content" class="hidden">
+      <h1>Authorize access</h1>
+      <p><span class="client" id="clientName">An application</span> wants to access your account.</p>
+
+      <div id="scopesWrap" class="scope-box hidden">
+        <div class="scope-title">Requested permissions</div>
+        <ul id="scopes"></ul>
+      </div>
+
+      <div id="alert" class="alert err"></div>
+
+      <div class="actions">
+        <button class="approve" id="approveBtn">Approve</button>
+        <button class="deny" id="denyBtn">Deny</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ==================================================================
+   CONFIG — same project as the login embed. Publishable key only.
+   ================================================================== */
+const SUPABASE_URL = "https://oeantajwvhcuvygyjxmi.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_AInCq8jj9Kk3KPFNrXPDmQ_x3dMCkDx";
+
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: { flowType: "pkce", detectSessionInUrl: true, persistSession: true, autoRefreshToken: true },
+});
+
+const $ = (id) => document.getElementById(id);
+const loadingEl = $("loading"), contentEl = $("content"), alertEl = $("alert");
+
+const authorizationId = new URLSearchParams(location.search).get("authorization_id");
+
+function fail(msg) {
+  loadingEl.classList.add("hidden");
+  contentEl.classList.remove("hidden");
+  alertEl.textContent = msg;
+  alertEl.classList.add("show");
+  $("approveBtn").disabled = true;
+  $("denyBtn").disabled = true;
+}
+
+(async () => {
+  if (!authorizationId) return fail("Missing authorization_id in the URL.");
+
+  /* 1. must be signed in first */
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) {
+    /* bounce to the login page, then come back here */
+    const back = encodeURIComponent(location.pathname + location.search);
+    location.replace("../../login.html?next=" + back);
+    return;
+  }
+
+  /* 2. sanity-check the OAuth client methods exist in this supabase-js build */
+  if (!db.auth.oauth || typeof db.auth.oauth.getAuthorizationDetails !== "function") {
+    return fail(
+      "This supabase-js build doesn't expose auth.oauth methods. " +
+      "Load the latest v2 from the CDN and hard-refresh (Ctrl+Shift+R)."
+    );
+  }
+
+  /* 3. fetch the authorization request details */
+  let details;
+  try {
+    const { data, error } = await db.auth.oauth.getAuthorizationDetails(authorizationId);
+    if (error) throw error;
+    details = data;
+  } catch (err) {
+    return fail("Could not load the authorization request: " + (err.message || err));
+  }
+
+  /* 4. render */
+  loadingEl.classList.add("hidden");
+  contentEl.classList.remove("hidden");
+
+  $("clientName").textContent = (details && details.client && details.client.name) || "An application";
+  const scopes = (details && details.scopes) || [];
+  if (scopes.length) {
+    $("scopesWrap").classList.remove("hidden");
+    $("scopes").innerHTML = scopes.map((s) => "<li>" + s + "</li>").join("");
+  }
+
+  /* 5. Approve / Deny — Supabase redirects the browser back to the client app */
+  const decide = async (approve) => {
+    $("approveBtn").disabled = true;
+    $("denyBtn").disabled = true;
+    try {
+      const { error } = await db.auth.oauth.approveAuthorization(authorizationId, { approve });
+      if (error) throw error;
+      /* on success Supabase redirects automatically */
+    } catch (err) {
+      alertEl.textContent = err.message || "Something went wrong.";
+      alertEl.classList.add("show");
+      $("approveBtn").disabled = false;
+      $("denyBtn").disabled = false;
+    }
+  };
+
+  $("approveBtn").addEventListener("click", () => decide(true));
+  $("denyBtn").addEventListener("click", () => decide(false));
+})();
+</script>
+</body>
+</html>

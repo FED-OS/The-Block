@@ -1,108 +1,196 @@
-# FED-SPA
+<div align="center">
 
-**Florida Establishment Directory — Spa & Parlor Assurance**
+# 🏛️ FED-EDU
 
-A no-backend, once-a-year directory of licensed massage establishments in the State of Florida — verified against the Florida DOH Medical Quality Assurance (MQA) portal — plus a subscriber-only, client-side-encrypted watchlist of businesses we could not find a license for.
+### The Sovereign AI, Coding & Tech Space for All Black Men
 
-> **Data as of 2026-09-11 · 47 licensed records · 44 watchlist entries · Release `2026.2`**
-> The data is a snapshot, not a live feed. **Always re-verify on the [MQA portal](https://mqa-internet.doh.state.fl.us/MQASearchServices/HealthCareProviders) before making any decision.** See [docs/legal_disclaimer.md](docs/legal_disclaimer.md).
+**(Urban Dictionary + GitHub) × FED-OS × fedpromptly**
 
-## The one-line pitch
+**Powered by [FED-OS](https://fedpromptly.com) — the educational wing of the ecosystem**
 
-You should never have to wonder whether the spa you're standing in front of is licensed. FED-SPA puts the verified answer on every screen you own — desktop, phone, tablet, browser, car, and wrist — with zero servers, zero trackers, and zero third-party code.
+<a href='support-the-block/kofi-button.html'>☕ Support the block — the Ko-fi button lives here</a>
 
-## The three constraints
-
-Every decision in this repo traces back to three rules. They are not preferences; they are the architecture:
-
-1. **No backend.** Static files only, updated once a year. There is no server, no API, no database, no account system. The "deployment" is copying files.
-2. **No third-party.** No external libraries, SDKs, services, analytics, or tracking on any surface. Python stdlib. Node's native `crypto`. Vanilla JS and CSS. androidx core + appcompat only. SwiftUI + CryptoKit + CommonCrypto only. If it isn't first-party platform code, it isn't in the repo.
-3. **Annual cadence.** The data refresh is a once-a-year human workflow. Everything downstream — UI, search, the "data as of" label, the absence of auto-refresh — respects that.
-
-## What's in it
-
-**Two tiers of data.** The licensed list is public record and ships as plaintext JSON — anyone can audit it, fork it, or load it into anything. The watchlist tier contains establishments where a documented search of the MQA portal found no license match; it is encrypted at rest (PBKDF2-SHA256 → AES-256-GCM) and decrypts only in the app after a subscriber enters the shared code. "No license found" is a prompt to ask questions, never a verdict — every watchlist entry carries the exact search terms and date in its `status_note`.
-
-**Six surfaces, one dataset.** A single source (`data/public/licensed.json` + the encrypted envelope) is fanned out by `admin_scripts/generate_public_files.py` to every platform, so nothing can drift:
-
-| Surface | Tier support | Notes |
-|---|---|---|
-| [web/](web/) — PWA | licensed + watchlist | installable, offline-capable, code kept in sessionStorage only |
-| [extension/](extension/) — Chrome MV3 | licensed + watchlist | domain badge + quick popup, opt-in remember-code |
-| [android/](android/) | licensed + watchlist | classic views, deep link `fedspa://parlor/MM41109`, home-screen widget |
-| [android_auto/](android_auto/) | licensed only | glanceable rows, voice-search entry — deliberate data minimization |
-| [watch/](watch/) | licensed only | glanceable list, readable at arm's length — deliberate data minimization |
-| [ios/](ios/) | licensed + watchlist | SwiftUI, zero SPM dependencies |
-
-The full capability matrix, including the reasoning behind every "licensed only" decision, is in [wiki/Platform-surface-map.md](wiki/Platform-surface-map.md).
-
-## Repository layout
-
-```
-FED-SPA/
-├── data/                    # the dataset — public licensed list + encrypted watchlist
-│   ├── public/licensed.json     # single source of truth (plaintext, auditable)
-│   ├── private/unlicensed.encrypted.json   # subscriber envelope (committed)
-│   └── private/unlicensed.plain.json       # NEVER committed — in .gitignore
-├── admin_scripts/           # annual data workflow: scrape_mqa.py, encrypt_unlicensed.js,
-│                            # validate_schema.py, generate_public_files.py, merge_and_encrypt.sh
-├── web/                     # installable PWA (no framework)
-├── extension/               # Chrome extension, Manifest V3
-├── android/  android_auto/  watch/   # three Kotlin modules (classic views only)
-├── ios/                     # SwiftUI app, zero SPM dependencies
-├── .github/                 # CI (GitHub-owned actions only), issue templates, PR template
-├── docs/                    # annual workflow, code distribution, legal, contributing
-├── wiki/                    # Home, Data-statistics, Platform-surface-map, FAQ,
-│                            # Crypto-envelope-spec, Annual-refresh-log
-├── discussion/              # welcome.md — the discussions landing page
-├── prompts/                 # ready-to-use AI-assistant prompts (constraints baked in)
-└── social-image.png         # repo social preview
-```
-
-## Getting the data on your screen
-
-Nothing here needs an install step beyond the platform's own tooling. The web app runs from any static file server (or `python3 -m http.server` in `web/`). The extension loads unpacked from `chrome://extensions`. The Android modules open in Android Studio. The iOS project opens in Xcode. Step-by-step for every surface lives in [INSTALL.md](INSTALL.md), and the deeper operational details are in [BUILD.md](BUILD.md) and [DEPLOYMENT.md](DEPLOYMENT.md).
-
-The licensed list is also downloadable as CSV — `web/data/licensed.csv` (mirrored at `data/licensed.csv` for the GitHub-Pages copy) — generated by the same fan-out from the same single source, so it can never drift from the JSON.
-
-## The annual refresh
-
-Once a year, a maintainer: re-checks every record against the MQA portal, edits the source JSON, validates against the schema, re-encrypts the watchlist, re-runs the fan-out script, and tags the release `data-<year>.<n>` (e.g. `data-2026.2`). It is a one-command workflow (`admin_scripts/merge_and_encrypt.sh`) with human verification at every step. The full procedure — including what happens when a record's status changes — is [docs/annual_update_workflow.md](docs/annual_update_workflow.md), and every release is logged in [wiki/Annual-refresh-log.md](wiki/Annual-refresh-log.md).
-
-Release `2026.2` was the first expansion release under this workflow: the **first full county sweep** — every massage-establishment directory listing on the US-1 / Federal Hwy corridor from Fort Pierce to Homestead (5 counties, 112 municipalities) checked against the portal, growing the licensed list from 1 to 47 records and filling the watchlist tier with its first 44 entries. The methodology and the inclusion bars are documented in [wiki/County-sweep-2026.2.md](wiki/County-sweep-2026.2.md); 283 corridor listings remain honestly unchecked for the next pass.
-
-## Verification policy
-
-Every record carries three honest fields: `verified_by` (the portal URL), `last_checked` (the date we looked), and `data_as_of` (the release date). No record enters the licensed list without a maintainer's eyes on the portal that day. No record enters the watchlist without a documented zero-match search recorded in `status_note`. Corrections are welcome and expected — use the **Data correction** issue template, and include what the portal shows now and your check date.
-
-## Security and privacy
-
-There is nothing to breach. No server, no accounts, no analytics, no collection. The subscriber code is never transmitted anywhere — it exists only in the user's browser session, opt-in local storage, or device keychain-equivalent. The crypto envelope spec is public and frozen: [wiki/Crypto-envelope-spec.md](wiki/Crypto-envelope-spec.md). Reporting a vulnerability? [SECURITY.md](SECURITY.md).
-
-## Contributing
-
-Corrections, translations, new-surface ports, and documentation fixes are welcome. The three constraints are non-negotiable in PRs — the [PR template](.github/PULL_REQUEST_TEMPLATE.md) enforces the checklist, and crypto changes must update all five implementations in lockstep. Start at [CONTRIBUTING.md](CONTRIBUTING.md) (quick rules) or [docs/contribution_guidelines.md](docs/contribution_guidelines.md) (the full version).
-
-## Support
-
-Data problems go to Issues with the right template; questions go to Discussions; the full routing table is in [SUPPORT.md](SUPPORT.md). If you're about to ask why there's no backend — the [FAQ](wiki/FAQ.md) has your answer, and then the argument you'll want to have.
-
-## Funding
-
-FED-SPA is a spare-time project. Static hosting sits in a free tier, and the annual refresh costs a maintainer a weekend. If it's useful to you, the tip jar is open:
-
-<a href='https://ko-fi.com/YOUR_USERNAME' target='_blank' rel='noopener noreferrer'>
-  <img height='36' style='border:0px;height:36px;' src='https://ko-fi.com/img/githubbutton_sm.svg' border='0' alt='Buy Me a Coffee at ko-fi.com' />
-</a>
-
-*(Replace `YOUR_USERNAME` with your Ko-fi handle. The same button appears in the web app footer — keep the two in sync.)*
-
-The subscriber tier has a one-time code rather than a subscription; what that means, and why, is laid out plainly in [PRICING.md](PRICING.md).
-
-## License
-
-Data and code are released under the licenses in [LICENSE](LICENSE) (code, MIT) and [COPYING.md](COPYING.md) (dataset, ODbL 1.0). Attribution norms for the dataset are in [CITATIONS.md](CITATIONS.md). The project is independent and unaffiliated with the State of Florida or any agency — see [NOTICE.md](NOTICE.md).
+</div>
 
 ---
 
-**FED-SPA is an independent public-records project.** It is not a government service, not a live feed, and not a legal determination of anything. Verify before you act: [https://mqa-internet.doh.state.fl.us/MQASearchServices/HealthCareProviders](https://mqa-internet.doh.state.fl.us/MQASearchServices/HealthCareProviders)
+## 📜 THE MANIFESTO
+
+Look at the board. **Kai Cenat** controls the traffic. **Jay-Z** owns the asset. **LeBron** executes the playbook. **Obama** commands the system. **Dr. King** organized the movement. **Kunta Kinte** protected the mind. Everything they do is high-level logic, strategy, and architecture. They did it in the streets, on the screens, and on the grass.
+
+**We are doing it on the keyboard.**
+
+FED-EDU is where all Black men unite to turn that exact same cultural genius into software, global code ownership, and real economic power. Every kind of Black man — the Jamaicans, the Haitians, the Africans, the Americans, the British, the gay and trans brothers, the young and the elders, the incarcerated and returning citizens, the kid who just got his first bike, the homeless brother in the shelter. The internet does not care who you are. When you write code, the machine only asks one question: **does the logic work?**
+
+**Stop being the product. Start running the platform.** The world uses Black culture, music, style, and energy to power the entire internet — but other people build the apps that cash the checks. This movement teaches every Black man how to build the pipes and collect the rent.
+
+---
+
+## ⚡ WHY THIS EXISTS
+
+Every mainstream tech space fails our people in the same three ways:
+
+**The vibe check fails.** Stack Overflow and coding subreddits look like corporate tax portals. Dry. Clinical. No culture, no rhythm, no style. Our brothers log in, look around, and feel like they walked into the wrong building.
+
+**The gatekeeping is elitist.** A beginner asks a basic question and gets downvoted, mocked, or deleted for "violating formatting rules." If you don't already know the language, they treat you like you don't belong. That kills a beginner's confidence before he ever writes his first line.
+
+**The content has zero cultural relevance.** They want you to calculate a bank's interest rates or sort corporate employee IDs. None of that connects to a brother trying to scale a music career, organize a local league, or build an exit off the block.
+
+FED-EDU is the answer to all three. The dialogue is raw and rooted in the shared language of the streets and the diaspora. The milestones we celebrate are the ones that actually matter — first push, first deploy, first customer. The projects you build are the ones you already care about: your music, your stats, your brand, your block.
+
+---
+
+## 🧮 THE EQUATION
+
+```
+FED-EDU = (Urban Dictionary + GitHub) × FED-OS × fedpromptly
+```
+
+- **Urban Dictionary** — The translation layer. Corporate tech terms get decoded into plain street logic instantly. "Initialize an asynchronous API endpoint" becomes "hit up your plug for the data without freezing your screen."
+- **GitHub** — The block. The open stash house of code where blueprints live, get forked, get customized, and get shipped. Collaborative, visual, instant wins.
+- **FED-OS** — The environment. A lightweight operating layer built for survival-level hardware: tethered phones, refurbished desktops, whatever you got.
+- **fedpromptly** — The AI engine. Instant coaching in plain language. No waiting on a forum for a know-it-all to answer. Tap in, say "my slider isn't loading on mobile, fix it," get the exact code and where to paste it.
+
+---
+
+## 🌍 THE GENERATIONAL ARC
+
+Our ancestors built the physical world with their bare hands from Kunta Kinte forward, but they didn't get the receipts. Dr. King marched so we could have the legal right to stand on our own two feet and claim economic power. Obama showed us we have the intellect to run the entire operation from the top. Now it's our turn. The next frontier isn't concrete or politics — it's code and AI. We are taking the brilliant, sharp, hustling minds we've always had and using them to build the digital future, in the simplest terms possible.
+
+**Kunta Kinte — Break the Digital Chains.** We are still working fields we don't own. Every hour you spend consuming content, clicking ads, and feeding your data into someone else's app, you are building their empire. Learning AI and coding is how you refuse to let them take your name and your mind.
+
+**MLK — The New Economic Blueprint.** Dr. King knew having the right to sit at a lunch counter meant nothing if you couldn't afford the burger. Tech is the new lunch counter. If our brothers are locked out of AI and coding, we are economically segregated all over again. This isn't just tech — it's economic civil rights.
+
+**Obama — Command the System.** Obama learned the rules of the constitutional system, organized the people, and took the driver's seat. Coding is the same thing — learning the rules of the digital system so you can write the laws of the internet. When you master AI and programming, you become the commander-in-chief of your own digital destiny.
+
+---
+
+## 🕹️ TECH IS REAL-LIFE MINECRAFT
+
+Traditional coding education forces you to memorize dry syntax and worry about what's "efficient" or whether it's already been built. We do the opposite. **We do whatever we want.** Pick one language or pick five. Grab what you need. Hack a solution together. Build things from pure imagination. Don't ask if it's been done — build it your way.
+
+A computer screen is an infinite open world where you mine resources, build fortresses, and reshape the environment from nothing. You don't need a certificate. You just start placing digital blocks. And when you're ready, you package that world and ship it — a website becomes an app, the app runs on every device, and the whole thing lives at a link you can text to anybody on Earth.
+
+**The pipeline:** Find what you like → pick a project that enhances it → fork a blueprint → edit it your way → push it live → share it → upgrade it → wrap it as an app → monetize it. That's the whole game.
+
+---
+
+## 🎯 WHAT'S INSIDE
+
+| Module | What It Does | Status |
+|---|---|---|
+| `core-system/` | The main dashboard — ultra-lightweight, runs on EasyTether connections | Live |
+| `wiki/` | The Logic Wiki — 12 plain-talk pages, four levels: Getting Online → First Steps → Building → Hustling | Live |
+| `courses-and-guides/` | EasyTether Mastery, Real-Life Minecraft, The Corporate Ship | Live |
+| `sandbox-blueprints/` | Ready-to-fork projects: Rap Lab, StatTracker, Media FX, Streamer Tools | Live |
+| `urban-dictionary/` | The decoder ring — tech jargon translated to street logic | Live |
+| `prompts/` | AI prompt library for the whole collective | Live |
+| `fedpromptly-coach/` | The AI bridge — instant coaching, no judgment | Live |
+| `excellence-matrix/` | Black male excellence across every sector mapped to tech skills | Live |
+| `discussion/` | The porch — categories, pinned posts, templates | Live |
+| `community-boards/` | Diaspora map, help desk, showcase vault | Live · map shows seed data |
+| `hustle-index/` | The marketplace · list your services, get hired, no background checks | Live · sample data only |
+| `physical-raffles/` | Refurbished PC giveaways — earn tickets by leveling up | Not live yet — rules only |
+| `fed-comm-dm/` | The custom GitHub DM system — private circuits, direct link-ups | Live |
+| `docs/` | The paperwork — ADRs, governance, build law, pricing floors, FAQ | Reference |
+
+> **Honest data rule:** anything shipped with example numbers (the diaspora map's city counts, the hustle index's sample profile, the leaderboard's seed rows) is labeled SEED DATA in the files themselves and on the pages. No fake member counts, no invented winners, no payment claims. Real entries replace them one PR at a time.
+---|---|
+| `core-system/` | The main dashboard — ultra-lightweight, runs on EasyTether connections |
+| `fed-comm-dm/` | The custom GitHub DM system — private circuits, direct link-ups |
+| `urban-dictionary/` | The decoder ring — tech jargon translated to street logic |
+| `fedpromptly-coach/` | The AI bridge — instant coaching, no judgment |
+| `courses-and-guides/` | EasyTether Mastery, Real-Life Minecraft, The Corporate Ship |
+| `sandbox-blueprints/` | Ready-to-fork projects: Rap Lab, StatTracker, Media FX, Streamer Tools |
+| `excellence-matrix/` | Black male excellence across every sector mapped to tech skills |
+| `hustle-index/` | The marketplace — list your services, get hired, no background checks |
+| `community-boards/` | Diaspora map, help desk, showcase vault |
+| `physical-raffles/` | Refurbished PC giveaways — earn tickets by leveling up |
+| `wiki/` | The Logic Wiki — knowledge in plain terms |
+| `discussion/` | The corner — categories, pinned posts, templates |
+| `prompts/` | AI prompt library for the whole collective |
+
+---
+
+## 🚀 SPAWN POINTS (Where To Start)
+
+**Brand new and never touched code?** Start with `wiki/First-Steps/Make-a-GitHub-Account.md`. Claim your name on the block, fork your first repo, push your first change. Earn the badge. That's Level 1.
+
+**Got a phone but no computer?** Start with `courses-and-guides/01-easytether-mastery/`. Learn to get any scrap machine online through your phone. You don't need Wi-Fi bills — you need a signal and a USB cord.
+
+**Know what you like already?** Jump into `sandbox-blueprints/`. Music? The Rap Lab. Ball? StatTracker. Design? Media FX. Streaming? Streamer Tools. Fork the blueprint, make it yours.
+
+**Ready to get paid?** Read `docs/PRICING.md`, complete your hustle file in `hustle-index/members/`, and list yourself on the marketplace.
+
+**Want to link with brothers?** Drop an intro in the discussions, follow the org and everyone in the directory, and start building the syndicate.
+
+---
+
+## 🛡️ THE GROUND RULES
+
+1. **No question is stupid.** If a brother doesn't know how to create a folder, we walk him through it. Zero judgment.
+2. **No jargon without translation.** If you can't explain it in plain terms, you don't understand it well enough to teach it here.
+3. **Celebrate the attempts.** The brother who pushed his first line of code gets the same dap as the one who shipped an app. The first step is the hardest part of the tunnel.
+4. **Zero tolerance for gatekeeping.** Elitism, mocking, downvote culture — banned. This is the anti-Stack Overflow.
+5. **Ownership stays with the builders.** Brothers who contribute to projects own their piece of the pie.
+6. **Protect the younger brothers.** Kids are in this space learning. Keep it a safe house.
+
+---
+
+## 🤝 THE CREW & CONNECTIONS
+
+- **FED-OS** — The lightweight operating environment that runs anywhere. The foundation.
+- **fedpromptly** — The AI engine. The coach.
+- **FED-EDU** — You're here. The school, the block, and the marketplace.
+
+Inspirations and organizations doing the work: The Hidden Genius Project, Black in AI, BLK Men in Tech, Black Boys Code, All Star Code, and Spill — proof that when we build our own spaces, we thrive.
+
+---
+
+## ☕ FUEL THE BLOCK
+
+Every Ko-fi contribution goes to refurbished desktops for the raffles, data plans for brothers learning on tethered phones, and hosting costs. Even $3 keeps a brother online tonight.
+
+<a href='support-the-block/kofi-button.html'>☕ Support the block — the Ko-fi button lives here</a>
+
+---
+
+## 🚀 PUT THIS SITE ON GITHUB PAGES (3 minutes, free)
+
+The whole block is static vanilla HTML — no build step, no node_modules, nothing to install. Push it to a repo and it's live.
+
+**1. Make the repo.** Create `yourname.github.io` (a user site — then the block lives at the root) or any repo named `FED-EDU` (a project site — it lives under `/FED-EDU/`). All internal links in this repo are relative, so either works untouched.
+
+**2. Push this folder.** From inside `the-block/`:
+```
+git init
+git add .
+git commit -m "the block: first light"
+git branch -M main
+git remote add origin https://github.com/YOUR-NAME/YOUR-REPO.git
+git push -u origin main
+```
+
+**3. Turn on Pages.** Repo → **Settings** → **Pages** → Build and deployment → **Source: GitHub Actions** (the included `.github/workflows/build.yml` runs the checks and deploys on every push to `main`). Save. First run takes ~2 minutes.
+
+**4. Open your URL.** `https://yourname.github.io` or `https://yourname.github.io/FED-EDU/`. Every push to `main` re-publishes automatically.
+
+**If you'd rather not use Actions:** Settings → Pages → **Source: Deploy from a branch** → branch `main`, folder `/ (root)`. Same result, no workflow.
+
+**The one maintenance habit:** when you change any page, the service worker (`service-worker.js`) needs its `CACHE_VERSION` bumped (v4 → v5) so brothers' phones drop the old copy and re-download. That's the whole ritual — the file's header explains it.
+
+**Before it truly goes live:** swap the Ko-fi placeholder — `support-the-block/kofi-button.html` holds a ready-made button with `YOUR_USERNAME` in two spots; make a real Ko-fi account, swap it, and the placeholder patrol in `build.yml` will pass. Until then every page still works, the button just points at the template page.
+
+---
+
+## ⚖️ LICENSE
+
+This project lives under the terms in `LICENSE`. See `docs/COPYING.md` for the plain-terms breakdown of what you can do with the code.
+
+<div align="center">
+
+**FED-EDU — from the trenches to the towers.**
+
+**We've done it before with everything else we touched. We're doing it again with tech.**
+
+</div>

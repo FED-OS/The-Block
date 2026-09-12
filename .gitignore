@@ -1,0 +1,40 @@
+# The Block — .gitignore
+# A static site with no build step, so this list is short on purpose.
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Local test artifacts (scripts and scratch files from working on the repo)
+*.local.*
+*.scratch.*
+/tmp-*
+temp-*
+*.log
+
+# Python tooling sometimes used when editing the HTML (never shipped)
+__pycache__/
+*.pyc
+.venv/
+
+# Node tooling (only used for syntax-checking scripts — never shipped)
+node_modules/
+package-lock.json
+
+# Don't commit real Supabase keys or local secrets
+.env
+.env.*
+*.env
+secrets.*
+sb_secret_*
+
+# Never commit these — they belong in the Supabase dashboard, not the repo
+# (the publishable key IS in the HTML by design; the secret key must not be)

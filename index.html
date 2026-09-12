@@ -132,15 +132,6 @@
       transform: rotate(-6deg);
       box-shadow: 0 0 22px rgba(198,255,61,.42);
     }
-    .nav-toggle {
-      display: none;
-      padding: .5rem .75rem;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      color: var(--ink);
-      background: var(--surface);
-      cursor: pointer;
-    }
     .theme-toggle {
       display: inline-flex;
       align-items: center;
@@ -156,18 +147,6 @@
       font-weight: 700;
     }
     .theme-toggle:hover { color: var(--green-dark); border-color: var(--green); }
-    .site-nav { display: flex; align-items: center; gap: .25rem; }
-    .site-nav a {
-      padding: .55rem .75rem;
-      border-radius: 8px;
-      color: #3b474e;
-      text-decoration: none;
-      font-size: .94rem;
-      font-weight: 650;
-      text-transform: uppercase;
-      letter-spacing: .04em;
-    }
-    .site-nav a:hover, .site-nav a:focus-visible { color: var(--green-dark); background: var(--green-light); }
 
     .hero {
       position: relative;
@@ -935,6 +914,13 @@
       font-weight: 700;
       cursor: pointer;
     }
+    .signin-inline button.ghost {
+      border-color: var(--line);
+      color: var(--muted);
+      background: none;
+    }
+    .signin-inline button.ghost:hover { color: var(--green-dark); border-color: var(--green); }
+    .signin-inline button + button { margin-left: .1rem; }
     .signin-inline .sent-ok { color: var(--acid); font-family: var(--mono); font-size: .75rem; }
 
     /* ---- BLM agency section ---- */
@@ -1144,22 +1130,6 @@
 
     @media (max-width: 760px) {
       .header-inner { min-height: 64px; }
-      .nav-toggle { display: inline-flex; }
-      .site-nav {
-        display: none;
-        position: absolute;
-        top: 64px;
-        left: 0;
-        right: 0;
-        flex-direction: column;
-        align-items: stretch;
-        gap: .2rem;
-        padding: .75rem 1rem 1rem;
-        border-bottom: 1px solid var(--line);
-        background: var(--paper);
-      }
-      .site-nav[data-open="true"] { display: flex; }
-      .site-nav a { padding: .7rem; }
       .hero, .section { padding: 3.75rem 0; }
       .hero-stage { grid-template-columns: 1fr; gap: 1.5rem; }
       .hero-art { min-height: 310px; }
@@ -1200,28 +1170,17 @@
         <span class="brand-mark" aria-hidden="true">B</span>
         <span>The Block</span>
       </a>
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
       <button class="theme-toggle" type="button" aria-pressed="false" aria-label="Switch to dark mode">
         <span aria-hidden="true">☾</span><span class="theme-toggle-label">Dark mode</span>
       </button>
-      <nav class="site-nav" id="site-nav" aria-label="Main navigation" data-open="false">
-        <a href="#start">Start here</a>
-        <a href="#resources">The good stuff</a>
-        <a href="#how-it-works">How to get moving</a>
-        <a href="#community">The crew</a>
-        <a href="#forum">The Forum</a>
-        <a href="#nocap">No Cap</a>
-        <a href="#blm">Black Leaders Mgmt</a>
-        <a href="#support">FAQ</a>
-      </nav>
-    </div>
+          </div>
   </header>
 
   <main id="main-content">
     <section class="hero" id="top">
       <div class="container hero-stage">
         <div class="hero-copy">
-          <p class="eyebrow">15 rooms · one hub · zero boring</p>
+          <p class="eyebrow">9 rooms · one hub · zero boring</p>
           <h1><span class="hero-word">EVERYTHING</span><br><span class="hero-outline">THE BLOCK RUNS ON</span></h1>
           <p class="lead">A neon lobby for ideas, prompts, guides, projects, and people. Pick a room. Tap in. Make a move.</p>
           <div class="button-row">
@@ -1230,8 +1189,7 @@
           </div>
           <div class="ticker" aria-hidden="true">HUSTLE ◆ PROMPTS ◆ THE WIKI ◆ COACHING ◆ COMMUNITY ◆ NO DEAD ENDS ◆ HUSTLE ◆ PROMPTS ◆ THE WIKI ◆ COACHING ◆</div>
           <div class="hero-stats">
-            <div><strong>15</strong><span>Rooms</span></div>
-            <div><strong>15</strong><span>Tabs</span></div>
+            <div><strong>9</strong><span>Rooms</span></div>
             <div><strong>1</strong><span>File</span></div>
             <div><strong>0</strong><span>Build steps</span></div>
           </div>
@@ -1565,7 +1523,7 @@ Please help me choose:
         </details>
         <details>
           <summary>How does the forum work?</summary>
-          <p>Pick a room that fits your topic, start a thread or reply to one, and keep the energy useful. You can attach images to threads and replies. The forum is live on Supabase — sign in with your email (magic link) to post, and your threads, replies, and pics are shared with the whole crew. Need a local-only version? Ask about demo mode.</p>
+          <p>Pick a room that fits your topic, start a thread or reply to one, and keep the energy useful. You can attach images to threads and replies. The forum is live on Supabase — sign in with your email + password (make an account right on the page) to post, and your threads, replies, and pics are shared with the whole crew. Need a local-only version? Ask about demo mode.</p>
         </details>
         <details>
           <summary>What is Black Leaders Management?</summary>
@@ -1614,8 +1572,6 @@ Please help me choose:
   </dialog>
 
   <script>
-    const menuButton = document.querySelector('.nav-toggle');
-    const navigation = document.querySelector('.site-nav');
     const themeButton = document.querySelector('.theme-toggle');
     const themeLabel = document.querySelector('.theme-toggle-label');
     const infoDialog = document.getElementById('info-dialog');
@@ -1659,21 +1615,6 @@ Please help me choose:
       document.documentElement.dataset.theme = darkMode ? 'dark' : 'light';
       localStorage.setItem('the-block-theme', darkMode ? 'dark' : 'light');
       updateThemeButton();
-    });
-
-    menuButton.addEventListener('click', () => {
-      const isOpen = navigation.dataset.open === 'true';
-      navigation.dataset.open = String(!isOpen);
-      menuButton.setAttribute('aria-expanded', String(!isOpen));
-      menuButton.textContent = isOpen ? 'Menu' : 'Close';
-    });
-
-    navigation.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', () => {
-        navigation.dataset.open = 'false';
-        menuButton.setAttribute('aria-expanded', 'false');
-        menuButton.textContent = 'Menu';
-      });
     });
 
     document.querySelectorAll('[data-copy]').forEach((button) => {
@@ -2139,7 +2080,7 @@ Please help me choose:
         const pics = await uploadImages(images);
         if (supa) {
           const { data: { user } } = await supa.auth.getUser();
-          if (!user) throw new Error('Sign in first (magic link email).');
+          if (!user) throw new Error('Sign in first (email + password).');
           const cat = catById(categoryId);
           const { data: catRow } = await supa.from('categories').select('id').eq('slug', cat.id).single();
           const { error } = await supa.from('threads').insert({
@@ -2163,7 +2104,7 @@ Please help me choose:
         const pics = await uploadImages(images);
         if (supa) {
           const { data: { user } } = await supa.auth.getUser();
-          if (!user) throw new Error('Sign in first (magic link email).');
+          if (!user) throw new Error('Sign in first (email + password).');
           const { error } = await supa.from('replies').insert({ thread_id: threadId, body, images: pics, author_id: user.id });
           if (error) throw error;
           return;
@@ -2180,7 +2121,7 @@ Please help me choose:
       async deleteThread(threadId) {
         if (supa) {
           const { data: { user } } = await supa.auth.getUser();
-          if (!user) throw new Error('Sign in first (magic link email).');
+          if (!user) throw new Error('Sign in first (email + password).');
           const { error } = await supa.from('threads').delete().eq('id', threadId);
           if (error) throw error;
           return;
@@ -2194,7 +2135,7 @@ Please help me choose:
       async deleteReply(threadId, replyId) {
         if (supa) {
           const { data: { user } } = await supa.auth.getUser();
-          if (!user) throw new Error('Sign in first (magic link email).');
+          if (!user) throw new Error('Sign in first (email + password).');
           const { error } = await supa.from('replies').delete().eq('id', replyId);
           if (error) throw error;
           return;
@@ -2211,7 +2152,7 @@ Please help me choose:
       async nocapDelete(postId) {
         if (supa) {
           const { data: { user } } = await supa.auth.getUser();
-          if (!user) throw new Error('Sign in first (magic link email).');
+          if (!user) throw new Error('Sign in first (email + password).');
           const { error } = await supa.from('nocap_posts').delete().eq('id', postId);
           if (error) throw error;
           return;
@@ -2226,7 +2167,7 @@ Please help me choose:
         /* demo: local tally + my-vote toggle. supabase: upsert thread_votes. */
         if (supa) {
           const { data: { user } } = await supa.auth.getUser();
-          if (!user) throw new Error('Sign in first (magic link email).');
+          if (!user) throw new Error('Sign in first (email + password).');
           const { error } = await supa.from('thread_votes')
             .upsert({ user_id: user.id, thread_id: threadId, value },
                     { onConflict: 'user_id,thread_id' });
@@ -2278,7 +2219,7 @@ Please help me choose:
         const pics = await uploadImages(images);
         if (supa) {
           const { data: { user } } = await supa.auth.getUser();
-          if (!user) throw new Error('Sign in first (magic link email).');
+          if (!user) throw new Error('Sign in first (email + password).');
           const { error } = await supa.from('nocap_posts').insert({ body, images: pics, author_id: user.id });
           if (error) throw error;
           return;
@@ -2296,7 +2237,7 @@ Please help me choose:
         /* on = true like / false unlike. demo: local tally. supabase: toggle row. */
         if (supa) {
           const { data: { user } } = await supa.auth.getUser();
-          if (!user) throw new Error('Sign in first (magic link email).');
+          if (!user) throw new Error('Sign in first (email + password).');
           if (on) {
             const { error } = await supa.from('nocap_likes').upsert(
               { user_id: user.id, post_id: postId },
@@ -2362,6 +2303,7 @@ Please help me choose:
 
     let state = { category: 'all', threadId: null, threads: [] };
 
+    /* email + password auth: mode is 'signin' | 'signup' */
     function renderAuth() {
       if (supa) {
         supa.auth.getUser().then(({ data: { user } }) => {
@@ -2379,33 +2321,45 @@ Please help me choose:
           }
           els.auth.innerHTML =
             '<span class="signin-inline">' +
-              '<input type="email" id="forum-email" placeholder="your@email.com" aria-label="Email for magic link">' +
+              '<input type="email" id="forum-email" placeholder="your@email.com" aria-label="Email" autocomplete="email">' +
+              '<input type="password" id="forum-pass" placeholder="password" aria-label="Password" autocomplete="current-password">' +
               '<button type="button" id="forum-signin">Sign in</button>' +
-              '<span class="sent-ok" id="forum-sent" hidden>✓ link sent</span>' +
+              '<button type="button" id="forum-signup" class="ghost">Sign up</button>' +
+              '<span class="sent-ok" id="forum-sent" hidden></span>' +
             '</span>';
           const btn = document.getElementById('forum-signin');
-          const input = document.getElementById('forum-email');
-          const send = async () => {
-            const email = input.value.trim();
+          const btn2 = document.getElementById('forum-signup');
+          const emailIn = document.getElementById('forum-email');
+          const passIn = document.getElementById('forum-pass');
+          const sent = document.getElementById('forum-sent');
+          const showSent = (msg) => { sent.textContent = msg; sent.removeAttribute('hidden'); };
+          const send = async (mode) => {
+            const email = emailIn.value.trim();
+            const pass = passIn.value;
             if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { toast('Enter a real email.'); return; }
-            btn.disabled = true; btn.textContent = 'Sending…';
-            let { error } = await supa.auth.signInWithOtp({
-              email,
-              options: { emailRedirectTo: window.location.origin }
-            });
-            if (error && /redirect/i.test(error.message || '')) {
-              /* this origin isn't on the allowlist yet - fall back to the project's Site URL */
-              ({ error } = await supa.auth.signInWithOtp({ email }));
+            if (!pass || pass.length < 6) { toast('Password needs 6+ characters.'); return; }
+            btn.disabled = true; btn2.disabled = true; btn.textContent = 'Working…';
+            try {
+              let error, data;
+              if (mode === 'signup') {
+                ({ data, error } = await supa.auth.signUp({ email, password: pass }));
+                if (!error && data.session) { toast('Account made. You\'re in. 🎯'); }
+                else if (!error) { toast('Account made — check your email to confirm. 📬'); showSent('check email to confirm'); }
+              } else {
+                ({ error } = await supa.auth.signInWithPassword({ email, password: pass }));
+                if (!error) toast('Signed in. Pull up. 🤝');
+              }
+              if (error) toast(error.message || 'Something went wrong. Try again.');
+            } catch (err) {
+              toast('Something went wrong. Try again.');
             }
-            btn.disabled = false; btn.textContent = 'Sign in';
-            if (error) { toast('Something went wrong. Try again.'); return; }
-            const sent = document.getElementById('forum-sent');
-            if (sent) sent.removeAttribute('hidden');
-            input.value = '';
-            toast('Check your email for the link. 📬');
+            btn.disabled = false; btn2.disabled = false; btn.textContent = 'Sign in';
           };
-          btn.addEventListener('click', send);
-          input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); send(); } });
+          btn.addEventListener('click', () => send('signin'));
+          btn2.addEventListener('click', () => send('signup'));
+          const onKey = (e) => { if (e.key === 'Enter') { e.preventDefault(); send('signin'); } };
+          emailIn.addEventListener('keydown', onKey);
+          passIn.addEventListener('keydown', onKey);
         });
       } else {
         const handle = readLS(LS_HANDLE, 'NewComer');
@@ -2835,6 +2789,13 @@ Please help me choose:
 
     /* ============ INIT ============ */
     if (!supa) els.note.removeAttribute('hidden');
+    /* Sweep stale sessions (account deleted server-side) so dead tokens
+       don't 403 on every load — one check, then storage is clean. */
+    if (supa) {
+      supa.auth.getUser().then(({ error }) => {
+        if (error) supa.auth.signOut();
+      });
+    }
     renderAuth();
     renderCategoryPills();
     refreshMe().then(() => {

@@ -8,9 +8,9 @@ Common questions about The Block, straight answers, no runaround.
 
 The Block is a forum and landing page built for Black people in AI, coding, and tech. Nine themed rooms, a No Cap anonymous feed, a BLM agency tab, image posting, votes, view counters, and full moderation tooling — all in one HTML file for the forum itself, backed by Supabase when you connect it.
 
-### Why did the top nav go away?
+### What's the deal with the top nav?
 
-It was removed in v0.4.0. The strip said "15 ROOMS 15 TABS" when the forum has nine rooms, and its links didn't all earn their slot. Navigation now runs through the room tabs in the forum, the footer links, and the in-page CTAs — every one of those goes somewhere real.
+It's here, and it stays. The strip was briefly removed in v0.4.0 on the theory that the room tabs covered navigation well enough on their own — that turned out to be wrong, so v0.5.0 brought it back. It links to Start here, The good stuff, How to get moving, The crew, The Forum, No Cap, Black Leaders Mgmt, and FAQ, it collapses into a menu button on phones, and the stat line next to it reads the honest numbers: 9 rooms, 1 file, 0 build steps.
 
 ### Why is the whole forum one HTML file?
 
